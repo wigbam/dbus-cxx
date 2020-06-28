@@ -129,7 +129,7 @@ namespace DBus
   {
     bool result = true;
 
-    if ( not interface ) return false;
+    if ( !interface ) return false;
 
     if ( interface->m_object ) interface->m_object->remove_interface( interface );
     
@@ -159,7 +159,7 @@ namespace DBus
     m_signal_interface_added.emit( interface );
 
     // TODO allow control over this
-    if ( not m_default_interface ) this->set_default_interface( interface->name() );
+    if ( !m_default_interface ) this->set_default_interface( interface->name() );
 
     return result;
   }
@@ -227,7 +227,7 @@ namespace DBus
     bool need_emit_default_changed = false;
     bool interface_removed = false;
 
-    if ( not interface ) return;
+    if ( !interface ) return;
 
     // ========== WRITE LOCK ==========
     pthread_rwlock_wrlock( &m_interfaces_rwlock );
@@ -287,7 +287,7 @@ namespace DBus
 
   bool ObjectProxy::has_interface( InterfaceProxy::pointer interface ) const
   {
-    if ( not interface ) return false;
+    if ( !interface ) return false;
     
     Interfaces::const_iterator current, upper;
     bool result = false;
@@ -352,9 +352,9 @@ namespace DBus
     Interfaces::iterator iter;
     InterfaceProxy::pointer old_default;
 
-    if ( not interface ) return false;
+    if ( !interface ) return false;
 
-    if ( not this->has_interface(interface) ) this->add_interface(interface);
+    if ( !this->has_interface(interface) ) this->add_interface(interface);
 
     old_default = m_default_interface;
     m_default_interface = interface;
@@ -366,7 +366,7 @@ namespace DBus
 
   void ObjectProxy::remove_default_interface()
   {
-    if ( not m_default_interface ) return;
+    if ( !m_default_interface ) return;
 
     InterfaceProxy::pointer old_default = m_default_interface;
     m_default_interface = InterfaceProxy::pointer();
@@ -375,26 +375,26 @@ namespace DBus
 
   bool ObjectProxy::add_method( const std::string& ifacename, MethodProxyBase::pointer method )
   {
-    if ( not method ) return false;
+    if ( !method ) return false;
     
     InterfaceProxy::pointer iface = this->interface(ifacename);
 
-    if ( not iface ) iface = this->create_interface(ifacename);
+    if ( !iface ) iface = this->create_interface(ifacename);
 
     return iface->add_method( method );
   }
 
   bool ObjectProxy::add_method( MethodProxyBase::pointer method )
   {
-    if ( not method ) return false;
+    if ( !method ) return false;
     
     InterfaceProxy::pointer iface = m_default_interface;
     
-    if ( not iface )
+    if ( !iface )
     {
       iface = this->interface("");
-      if ( not iface ) iface = this->create_interface("");
-      if ( not m_default_interface ) this->set_default_interface(iface);
+      if ( !iface ) iface = this->create_interface("");
+      if ( !m_default_interface ) this->set_default_interface(iface);
     }
 
     return iface->add_method(method);
@@ -434,7 +434,7 @@ namespace DBus
 
   ReturnMessage::const_pointer ObjectProxy::call( CallMessage::const_pointer call_message, int timeout_milliseconds ) const
   {
-    if ( not m_connection or not m_connection->is_valid() ) return ReturnMessage::const_pointer();
+    if ( !m_connection || !m_connection->is_valid() ) return ReturnMessage::const_pointer();
 
 //     if ( not call_message->expects_reply() )
 //     {
@@ -447,7 +447,7 @@ namespace DBus
 
   PendingCall::pointer ObjectProxy::call_async( CallMessage::const_pointer call_message, int timeout_milliseconds ) const
   {
-    if ( not m_connection or not m_connection->is_valid() ) return PendingCall::pointer();
+    if ( !m_connection || !m_connection->is_valid() ) return PendingCall::pointer();
 
     return m_connection->send_with_reply_async( call_message, timeout_milliseconds );
   }

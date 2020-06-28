@@ -40,7 +40,7 @@ define([METHOD_VOID],[dnl
     {
       DBUSCXX_DEBUG_STDSTR("dbus.Method", "Method<LIST(void, LOOP(T_arg%1, $1))>::handle_call_message   method=" << m_name );
       
-      if ( not connection or not message ) return NOT_HANDLED;
+      if ( !connection || !message ) return NOT_HANDLED;
 
       dnl
       FOR(1, $1,[
@@ -63,7 +63,7 @@ define([METHOD_VOID],[dnl
       if ( message->expects_reply() )
       {
         retmsg = message->create_reply();
-        if ( not retmsg ) return NOT_HANDLED;
+        if ( !retmsg ) return NOT_HANDLED;
         connection << retmsg;
       }
 

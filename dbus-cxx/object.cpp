@@ -49,7 +49,7 @@ namespace DBus
   bool Object::register_with_connection(Connection::pointer conn)
   {
     SIMPLELOGGER_DEBUG("dbus.Object","Object::register_with_connection");
-    if ( not ObjectPathHandler::register_with_connection(conn) ) return false;
+    if ( !ObjectPathHandler::register_with_connection(conn) ) return false;
 
     for (Interfaces::iterator i = m_interfaces.begin(); i != m_interfaces.end(); i++)
       i->second->set_connection(conn);
@@ -86,7 +86,7 @@ namespace DBus
   {
     bool result = true;
 
-    if ( not interface ) return false;
+    if ( !interface ) return false;
     
     SIMPLELOGGER_DEBUG("dbus.Object","Object::add_interface " << interface->name() );
 
@@ -116,7 +116,7 @@ namespace DBus
     m_signal_interface_added.emit( interface );
 
     // TODO allow control over this
-    if ( not m_default_interface ) this->set_default_interface( interface->name() );
+    if ( !m_default_interface ) this->set_default_interface( interface->name() );
 
     SIMPLELOGGER_DEBUG("dbus.Object","Object::add_interface " << interface->name() << " successful: " << result);
 
@@ -226,7 +226,7 @@ namespace DBus
 
   void Object::remove_default_interface()
   {
-    if ( not m_default_interface ) return;
+    if ( !m_default_interface ) return;
 
     Interface::pointer old_default = m_default_interface;
     m_default_interface = Interface::pointer();
@@ -247,8 +247,8 @@ namespace DBus
 
   bool Object::add_child(const std::string& name, Object::pointer child, bool force)
   {
-    if ( not child ) return false;
-    if ( not force and this->has_child(name) ) return false;
+    if ( !child ) return false;
+    if ( !force && this->has_child(name) ) return false;
     m_children[name] = child;
     if ( m_connection ) child->register_with_connection(m_connection);
     return true;
@@ -318,7 +318,7 @@ namespace DBus
       return NOT_HANDLED;
     }
 
-    if ( not callmessage ) return NOT_HANDLED;
+    if ( !callmessage ) return NOT_HANDLED;
 
     SIMPLELOGGER_DEBUG("dbus.Object","Object::handle_message: message is good (it's a call message) for interface '" << callmessage->interface() << "'");
 
@@ -374,7 +374,7 @@ namespace DBus
       }
     }
 
-    if (result == NOT_HANDLED and m_default_interface)
+    if (result == NOT_HANDLED && m_default_interface)
       result = m_default_interface->handle_call_message(connection, callmessage);
 
     // ========== UNLOCK ==========

@@ -102,7 +102,7 @@ namespace DBus
   {
     bool result = true;
     
-    if ( not method ) return false;
+    if ( !method ) return false;
 
     if ( this->has_method(method) ) return false;
 
@@ -174,7 +174,7 @@ namespace DBus
     Methods::iterator current, upper;
     MethodSignalNameConnections::iterator i;
 
-    if ( not method ) return;
+    if ( !method ) return;
 
     // ========== WRITE LOCK ==========
     pthread_rwlock_wrlock( &m_methods_rwlock );
@@ -227,7 +227,7 @@ namespace DBus
     Methods::const_iterator current, upper;
     bool found = false;
 
-    if ( not method ) return false;
+    if ( !method ) return false;
     
     // ========== READ LOCK ==========
     pthread_rwlock_rdlock( &m_methods_rwlock );
@@ -255,19 +255,19 @@ namespace DBus
 
   CallMessage::pointer InterfaceProxy::create_call_message( const std::string& method_name ) const
   {
-    if ( not m_object ) return CallMessage::pointer();
+    if ( !m_object ) return CallMessage::pointer();
     return m_object->create_call_message( m_name, method_name );
   }
 
   ReturnMessage::const_pointer InterfaceProxy::call( CallMessage::const_pointer call_message, int timeout_milliseconds ) const
   {
-    if ( not m_object ) return ReturnMessage::const_pointer();
+    if ( !m_object ) return ReturnMessage::const_pointer();
     return m_object->call( call_message, timeout_milliseconds );
   }
 
   PendingCall::pointer InterfaceProxy::call_async( CallMessage::const_pointer call_message, int timeout_milliseconds ) const
   {
-    if ( not m_object ) return PendingCall::pointer();
+    if ( !m_object ) return PendingCall::pointer();
     return m_object->call_async( call_message, timeout_milliseconds );
   }
 
@@ -288,7 +288,7 @@ namespace DBus
   bool InterfaceProxy::add_signal(signal_proxy_base::pointer sig)
   {
     // is it a valid signal?
-    if ( not sig ) return false;
+    if ( !sig ) return false;
 
     // is it already added?
     if ( m_signals.find(sig) != m_signals.end() ) return false;
@@ -301,7 +301,7 @@ namespace DBus
     m_signals.insert(sig);
 
     // connect it
-    if ( this->connection() and this->connection()->is_valid() )
+    if ( this->connection() && this->connection()->is_valid() )
       this->connection()->add_signal_proxy(sig);
 
     return true;
@@ -314,8 +314,8 @@ namespace DBus
 
   bool InterfaceProxy::remove_signal(signal_proxy_base::pointer sig)
   {
-    if ( not sig ) return false;
-    if ( not this->has_signal(sig) ) return false;
+    if ( !sig ) return false;
+    if ( !this->has_signal(sig) ) return false;
     this->connection()->remove_signal_proxy(sig);
     m_signals.erase(sig);
     return true;
@@ -391,8 +391,8 @@ namespace DBus
   {
     for ( Signals::iterator i = m_signals.begin(); i != m_signals.end(); i++ )
     {
-      if ( (not conn or not conn->is_valid()) and (*i)->connection() ) (*i)->connection()->remove_signal_proxy(*i);
-      if ( conn and conn->is_valid() )
+      if ( (!conn || !conn->is_valid()) && (*i)->connection() ) (*i)->connection()->remove_signal_proxy(*i);
+      if ( conn && conn->is_valid() )
       {
         for ( Signals::iterator i = m_signals.begin(); i != m_signals.end(); i++ )
           conn->add_signal_proxy( *i );

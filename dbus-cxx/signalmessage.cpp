@@ -24,21 +24,21 @@ namespace DBus
   SignalMessage::SignalMessage( DBusMessage* cobj, CreateMethod m ):
       Message(cobj, m)
   {
-    if ( not cobj or dbus_message_get_type(cobj) != DBUS_MESSAGE_TYPE_SIGNAL )
+    if ( !cobj || dbus_message_get_type(cobj) != DBUS_MESSAGE_TYPE_SIGNAL )
       throw ErrorInvalidMessageType::create();
   }
   
   SignalMessage::SignalMessage( Message::pointer msg ):
       Message( msg )
   {
-    if ( not msg or not *msg or msg->type() != SIGNAL_MESSAGE )
+    if ( !msg || !*msg || msg->type() != SIGNAL_MESSAGE )
       throw ErrorInvalidMessageType::create();
   }
 
   SignalMessage::SignalMessage( Message::const_pointer msg ):
       Message( msg )
   {
-    if ( not msg or not *msg or msg->type() != SIGNAL_MESSAGE )
+    if ( !msg || !*msg || msg->type() != SIGNAL_MESSAGE )
       throw ErrorInvalidMessageType::create();
   }
 

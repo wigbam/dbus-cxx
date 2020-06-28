@@ -241,7 +241,7 @@ namespace DBus
         
       template <typename T>
       operator std::vector<T>() {
-        if ( not this->is_array() )
+        if ( !this->is_array() )
           throw ErrorInvalidTypecast::create( "MessageIterator: Extracting non array into std::vector" );
 
         if ( this->is_fixed() )
@@ -252,7 +252,7 @@ namespace DBus
 
       template <typename Key, typename Data>
       operator std::map<Key,Data>() {
-        if ( not this->is_dict() )
+        if ( !this->is_dict() )
           throw ErrorInvalidTypecast::create( "MessageIterator: Extracting non dict into std::map" );
 
         return get_dict<Key,Data>();
@@ -273,7 +273,7 @@ namespace DBus
 
       template <typename T>
       void get_array_simple( std::vector<T>& array ) {
-        if ( not this->is_fixed() ) /* This should never happen */
+        if ( !this->is_fixed() ) /* This should never happen */
           throw ErrorInvalidTypecast::create( "MessageIterator: Extracting non fixed array into std::vector" );
         
         T type;
@@ -302,7 +302,7 @@ namespace DBus
       
       template <typename T>
       std::vector<T> get_array_simple() {
-        if ( not this->is_fixed() ) /* This should never happen */
+        if ( !this->is_fixed() ) /* This should never happen */
           throw ErrorInvalidTypecast::create( "MessageIterator: Extracting non fixed array into std::vector" );
         
         T type;
@@ -332,7 +332,7 @@ namespace DBus
       
       template <typename T>
       void get_array_complex(std::vector<T> &array) {
-        if ( not this->is_array() ) /* Should never happen */
+        if ( !this->is_array() ) /* Should never happen */
           throw ErrorInvalidTypecast::create( "MessageIterator: Extracting non array into std::vector" );
 
         T type;
@@ -359,7 +359,7 @@ namespace DBus
 
       template <typename T>
       std::vector<T> get_array_complex() {
-        if ( not this->is_array() ) /* Should never happen */
+        if ( !this->is_array() ) /* Should never happen */
           throw ErrorInvalidTypecast::create( "MessageIterator: Extracting non array into std::vector" );
 
         T type;
@@ -484,7 +484,7 @@ DBUS_CXX_DEBUG( "ERR: " << __FILE__ << __LINE__ );
       template <typename Key, typename Data>
       MessageIterator& operator>>( std::map<Key,Data>& m )
       {
-        if ( not this->is_dict() )
+        if ( !this->is_dict() )
           throw ErrorInvalidTypecast::create( "MessageIterator: Extracting non dict into std::map" );
         try{
           get_dict<Key,Data>( m );
@@ -500,7 +500,7 @@ DBUS_CXX_DEBUG( "ERR: " << __FILE__ << __LINE__ );
       template <typename T>
       MessageIterator& operator>>( std::vector<T>& v )
       {
-        if ( not this->is_array() )
+        if ( !this->is_array() )
           throw ErrorInvalidTypecast::create( "MessageIterator: Extracting non array into std::vector" );
 	try{
          // this->get_array<T>(v);

@@ -57,7 +57,7 @@ namespace DBus
 
   bool MessageIterator::init(const Message & message)
   {
-    if ( message and dbus_message_iter_init(message.cobj(), &m_cobj) )
+    if ( message && dbus_message_iter_init(message.cobj(), &m_cobj) )
     {
       m_message = &message;
       return true;
@@ -75,7 +75,7 @@ namespace DBus
 
   bool MessageIterator::is_valid() const
   {
-    if ( not (m_message and m_message->is_valid() ) ) return false;
+    if ( !(m_message && m_message->is_valid() ) ) return false;
     if ( this->arg_type() == TYPE_INVALID ) return false;
     return true;
   }
@@ -88,13 +88,13 @@ namespace DBus
 
   bool MessageIterator::next()
   {
-    if ( not this->is_valid() ) return false;
+    if ( !this->is_valid() ) return false;
 
     bool result;
 
     result = dbus_message_iter_next( & m_cobj );
 
-    if ( not result or this->arg_type() == TYPE_INVALID )
+    if ( !result || this->arg_type() == TYPE_INVALID )
     {
       this->invalidate();
       return false;
@@ -158,7 +158,7 @@ namespace DBus
   {
     MessageIterator iter;
 
-    if ( not this->is_container() ) return iter;
+    if ( !this->is_container() ) return iter;
     
     iter.m_message = m_message;
     dbus_message_iter_recurse( & m_cobj, & ( iter.m_cobj ) );
@@ -563,7 +563,7 @@ namespace DBus
   const char* MessageIterator::get_string()
   {
     char* ptr;
-    if ( not ( this->arg_type() == TYPE_STRING or this->arg_type() == TYPE_OBJECT_PATH or this->arg_type() == TYPE_SIGNATURE ) )
+    if ( !( this->arg_type() == TYPE_STRING || this->arg_type() == TYPE_OBJECT_PATH || this->arg_type() == TYPE_SIGNATURE ) )
       throw ErrorInvalidTypecast::create("MessageIterator: getting char* and type is not one of TYPE_STRING, TYPE_OBJECT_PATH or TYPE_SIGNATURE");
     dbus_message_iter_get_basic( &m_cobj, &ptr );
     return ptr;

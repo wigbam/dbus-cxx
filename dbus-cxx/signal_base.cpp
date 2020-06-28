@@ -143,7 +143,7 @@ namespace DBus
   bool signal_base::handle_dbus_outgoing(Message::const_pointer msg)
   {
     Connection::pointer conn = m_connection.lock();
-    if ( not conn or not conn->is_valid() ) return false;
+    if ( !conn || !conn->is_valid() ) return false;
     conn << msg;
     return true;
   }

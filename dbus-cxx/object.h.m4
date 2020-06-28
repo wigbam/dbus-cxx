@@ -40,7 +40,7 @@ define([DEFINE_CREATE_METHOD],[dnl
   DBusCxxPointer<Method<LIST(T_return, LOOP(T_arg%1, $1))> >
   Object::create_method( const std::string& method_name, sigc::slot$1<LIST(T_return, LOOP(T_arg%1, $1))> slot )
   {
-    if ( not m_default_interface )
+    if ( !m_default_interface )
     {
       this->create_interface("");
       this->set_default_interface("");
@@ -77,7 +77,7 @@ define([DEFINE_CREATE_INTERFACE_METHOD],[dnl
   {
     Interface::pointer interface;
     interface = this->interface(interface_name);
-    if ( not interface ) interface = this->create_interface(interface_name);
+    if ( !interface ) interface = this->create_interface(interface_name);
     // TODO throw an error if the interface still doesn't exist
 
     DBusCxxPointer< Method<LIST(T_return, LOOP(T_arg%1, $1))> > method;
@@ -108,7 +108,7 @@ define([DEFINE_CREATE_SIGNAL_N],[dnl
   {
     DBusCxxPointer<DBus::signal<LIST(T_return, LOOP(T_arg%1, $1))> > sig;
     Interface::pointer iface = this->default_interface();
-    if ( not iface ) iface = this->create_interface("");
+    if ( !iface ) iface = this->create_interface("");
     sig = iface->create_signal<LIST(T_return, LOOP(T_arg%1, $1))>(name);
     return sig;
   }
@@ -133,7 +133,7 @@ define([DEFINE_CREATE_SIGNAL_IN],[dnl
   Object::create_signal( const std::string& iface, const std::string& name )
   {
     DBusCxxPointer<DBus::signal<LIST(T_return, LOOP(T_arg%1, $1))> > sig;
-    if ( not has_interface(iface) ) this->create_interface(iface);
+    if ( !has_interface(iface) ) this->create_interface(iface);
     sig = this->interface(iface)->create_signal<LIST(T_return, LOOP(T_arg%1, $1))>(name);
     return sig;
   }

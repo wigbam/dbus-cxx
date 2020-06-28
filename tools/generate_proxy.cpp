@@ -58,10 +58,10 @@ std::string generate_proxy_h(Node n)
        << "#define " << definestr << "\n\n"
        << "#include <dbus-cxx.h>\n\n";
 
-  if ( not n.cppinclude.empty() )
+  if ( !n.cppinclude.empty() )
     sout << "#include " << n.cppinclude << "\n\n";
 
-  if ( not n.proxy_parent_include.empty() )
+  if ( !n.proxy_parent_include.empty() )
     sout << "#include " << n.proxy_parent_include << "\n\n";
 
   std::vector<std::string> oppi = n.other_proxy_parent_includes();
@@ -70,7 +70,7 @@ std::string generate_proxy_h(Node n)
   
   for ( std::vector<Node>::iterator i = n.children.begin(); i != n.children.end(); i++ )
   {
-    if ( not i->proxy_include.empty() )
+    if ( !i->proxy_include.empty() )
       sout << "#include " << i->proxy_include << "\n";
   }
 

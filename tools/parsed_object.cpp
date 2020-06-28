@@ -95,7 +95,7 @@ void merge( std::map<std::string,std::string>& tgt, const std::map<std::string,s
   for ( s = src.begin(); s != src.end(); s++ )
   {
     t = tgt.find( s->first );
-    if ( t != tgt.end() and t->second != s->second )
+    if ( t != tgt.end() && t->second != s->second )
     {
       std::string errstr = "Error: multiple mappings to " + t->first;
       throw (errstr);
@@ -223,7 +223,7 @@ std::vector< std::string > Interface::cpp_adapter_stubs()
   }
   for ( unsigned int i = 0; i < signals.size(); i++ ) {
     signals[i].set_interface( this );
-    if ( signals[i].args_valid() and not signals[i].get_ignored() )
+    if ( signals[i].args_valid() && !signals[i].get_ignored() )
     {
       strings.push_back( signals[i].adapter_signal_declare() );
       strings.push_back( signals[i].adapter_signal_conn_declare() );
@@ -334,7 +334,7 @@ std::string Node::cpp_namespace_end( const std::string& tab )
 
 std::string Node::adaptee_fqn()
 {
-  if ( not orig_namespace.empty() )
+  if ( !orig_namespace.empty() )
     return orig_namespace + "::" + name();
   if ( name().empty() ) 
     return "AdapterName";
@@ -368,7 +368,7 @@ std::vector< std::string > Node::other_proxy_parents()
   size_t last = 0;
   for ( size_t i=0; i < other_proxy_parents_str.size(); i++ )
   {
-    if ( i != 0 and other_proxy_parents_str[i] == ';' )
+    if ( i != 0 && other_proxy_parents_str[i] == ';' )
     {
       std::string parent = other_proxy_parents_str.substr(last, i);
       result.push_back(parent);
@@ -384,7 +384,7 @@ std::vector< std::string > Node::other_proxy_parent_includes()
   size_t last = 0;
   for ( size_t i=0; i < other_proxy_parent_includes_str.size(); i++ )
   {
-    if ( i != 0 and other_proxy_parent_includes_str[i] == ';' )
+    if ( i != 0 && other_proxy_parent_includes_str[i] == ';' )
     {
       std::string incl = other_proxy_parent_includes_str.substr(last, i);
       result.push_back(incl);

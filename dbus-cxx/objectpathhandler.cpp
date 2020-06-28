@@ -67,7 +67,7 @@ namespace DBus
 
     SIMPLELOGGER_DEBUG("dbus.ObjectPathHandler","Registering path " << m_path << " with connection");
 
-    if ( not conn or not conn->is_valid() ) return false;
+    if ( !conn || !conn->is_valid() ) return false;
 
     if ( m_connection )
     {
@@ -87,7 +87,7 @@ namespace DBus
       result = dbus_connection_register_fallback( conn->cobj(), m_path.c_str(), &m_dbus_vtable, this );
 #endif
     
-    if ( not result ) return false;
+    if ( !result ) return false;
 
     m_connection = conn;
     
@@ -97,7 +97,7 @@ namespace DBus
   bool ObjectPathHandler::unregister(Connection::pointer conn)
   {
     dbus_bool_t result;
-    if ( not conn or not conn->is_valid() ) return false;
+    if ( !conn || !conn->is_valid() ) return false;
     result = dbus_connection_unregister_object_path( conn->cobj(), m_path.c_str() );
     if ( result ) m_connection.reset();
     return result;

@@ -43,7 +43,7 @@ namespace DBus
     if ( msg->type() != ERROR_MESSAGE )
       throw ErrorInvalidMessageType::create();
 
-    if ( msg and *msg )
+    if ( msg && *msg )
     {
       m_cobj = msg->cobj();
       dbus_message_ref( m_cobj );
@@ -52,7 +52,7 @@ namespace DBus
 
   ErrorMessage::ErrorMessage( Message::const_pointer to_reply, const std::string& name, const std::string& message )
   {
-    if ( to_reply and *to_reply )
+    if ( to_reply && *to_reply )
       m_cobj = dbus_message_new_error( to_reply->cobj(), name.c_str(), message.c_str() );
   }
 

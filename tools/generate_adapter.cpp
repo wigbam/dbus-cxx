@@ -48,15 +48,15 @@ std::string generate_adapter_h(Node n)
       << "#define " << definestr << "\n\n"
       << "#include <dbus-cxx.h>\n\n";
 
-  if ( not n.cppinclude.empty() )
+  if ( !n.cppinclude.empty() )
     sout << "#include " << n.cppinclude << "\n\n";
 
-  if ( not n.adapter_parent_include.empty() )
+  if ( !n.adapter_parent_include.empty() )
     sout << "#include " << n.adapter_parent_include << "\n\n";
 
   for ( std::vector<Node>::iterator i = n.children.begin(); i != n.children.end(); i++ )
   {
-    if ( not i->adapter_include.empty() )
+    if ( !i->adapter_include.empty() )
       sout << "#include " << i->adapter_include << "\n";
   }
 
@@ -181,7 +181,7 @@ std::string generate_adapter_h(Node n)
   for ( std::vector<Node>::iterator i = n.children.begin(); i != n.children.end(); i++ )
     sout << decl_indent << i->adapter << "::pointer m_" << i->name() << ";\n";
 
-  sout << "\n" << decl_indent << "void check_adaptee() { if ( not m_adaptee) throw ::DBus::ErrorInvalidAdaptee::create(); }\n\n";
+  sout << "\n" << decl_indent << "void check_adaptee() { if ( !m_adaptee) throw ::DBus::ErrorInvalidAdaptee::create(); }\n\n";
 
   for ( unsigned i=0; i < n.interfaces.size(); i++ )
   {

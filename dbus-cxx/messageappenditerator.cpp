@@ -31,7 +31,7 @@ namespace DBus
     bool result;
     dbus_bool_t b = v;
 
-    if ( not this->is_valid() ) return false;
+    if ( !this->is_valid() ) return false;
 
     result = dbus_message_iter_append_basic( &m_cobj, TYPE_BOOLEAN, &b );
 
@@ -48,7 +48,7 @@ namespace DBus
   bool MessageAppendIterator::protected_append( const Signature& v )
   {
     bool result;
-    if ( not this->is_valid() ) return false;
+    if ( !this->is_valid() ) return false;
     const std::string& sig = v;
     const char* pstr = sig.c_str();
     result = dbus_message_iter_append_basic( &m_cobj, TYPE_SIGNATURE, &(pstr) );
@@ -59,7 +59,7 @@ namespace DBus
   bool MessageAppendIterator::protected_append( const Path& v )
   {
     bool result;
-    if ( not this->is_valid() ) return false;
+    if ( !this->is_valid() ) return false;
     const char* pstr = v.c_str();
     result = dbus_message_iter_append_basic( &m_cobj, TYPE_OBJECT_PATH, &(pstr) );
     if ( ! result ) m_message->invalidate();
@@ -72,7 +72,7 @@ namespace DBus
   {
     bool result;
 
-    if ( not this->is_valid() ) return false;
+    if ( !this->is_valid() ) return false;
 
     result = dbus_message_iter_append_basic( &m_cobj, DBus::type( v ), &v );
 
@@ -85,7 +85,7 @@ namespace DBus
     bool result;
     int raw_fd = fd->getDescriptor();
 
-    if ( not this->is_valid() ) return false;
+    if ( !this->is_valid() ) return false;
 
     result = dbus_message_iter_append_basic( &m_cobj, DBus::type( *fd ), &raw_fd );
 
@@ -149,7 +149,7 @@ namespace DBus
 
   bool MessageAppendIterator::is_valid() const
   {
-    if ( not( m_message and m_message->is_valid() ) ) return false;
+    if ( !( m_message && m_message->is_valid() ) ) return false;
     return true;
   }
 

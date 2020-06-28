@@ -57,7 +57,7 @@ struct Interface {
   
   std::string strfmt(int depth=0);
 
-  std::string name() { if ( not cxx_name.empty() ) return cxx_name; return dbus_name; }
+  std::string name() { if ( !cxx_name.empty() ) return cxx_name; return dbus_name; }
 
   std::vector<std::string> cpp_adapter_methods_signals_create();
   std::vector<std::string> cpp_proxy_methods_signals();

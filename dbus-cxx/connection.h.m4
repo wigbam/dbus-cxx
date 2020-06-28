@@ -504,7 +504,7 @@ FOR(0, eval(CALL_SIZE),[[CREATE_SIGNAL_PIN(%1)
 inline
 DBus::Connection::pointer operator<<(DBus::Connection::pointer ptr, DBus::Message::pointer msg)
 {
-  if (not ptr) return ptr;
+  if (!ptr) return ptr;
   *ptr << msg;
   return ptr;
 }
@@ -512,7 +512,7 @@ DBus::Connection::pointer operator<<(DBus::Connection::pointer ptr, DBus::Messag
 inline
 DBus::Connection::pointer operator<<(DBus::Connection::pointer ptr, DBus::Message::const_pointer msg)
 {
-  if (not ptr) return ptr;
+  if (!ptr) return ptr;
   *ptr << msg;
   return ptr;
 }
@@ -520,7 +520,7 @@ DBus::Connection::pointer operator<<(DBus::Connection::pointer ptr, DBus::Messag
 inline
 DBus::Connection::pointer operator<<(DBus::Connection::pointer ptr, DBus::ReturnMessage::pointer msg)
 {
-  if (not ptr) return ptr;
+  if (!ptr) return ptr;
   *ptr << msg;
   return ptr;
 }
@@ -528,7 +528,7 @@ DBus::Connection::pointer operator<<(DBus::Connection::pointer ptr, DBus::Return
 inline
 DBus::Connection::pointer operator<<(DBus::Connection::pointer ptr, DBus::ReturnMessage::const_pointer msg)
 {
-  if (not ptr) return ptr;
+  if (!ptr) return ptr;
   *ptr << msg;
   return ptr;
 }
@@ -536,7 +536,7 @@ DBus::Connection::pointer operator<<(DBus::Connection::pointer ptr, DBus::Return
 inline
 DBus::Connection::pointer operator<<(DBus::Connection::pointer ptr, DBus::SignalMessage::pointer msg)
 {
-  if (not ptr) return ptr;
+  if (!ptr) return ptr;
   *ptr << msg;
   return ptr;
 }
@@ -544,7 +544,7 @@ DBus::Connection::pointer operator<<(DBus::Connection::pointer ptr, DBus::Signal
 inline
 DBus::Connection::pointer operator<<(DBus::Connection::pointer ptr, DBus::SignalMessage::const_pointer msg)
 {
-  if (not ptr) return ptr;
+  if (!ptr) return ptr;
   *ptr << msg;
   return ptr;
 }

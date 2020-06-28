@@ -169,7 +169,7 @@ template <typename T>
 inline
 DBus::Message::iterator operator>>( DBus::Message::const_pointer ptr, T& value )
 {
-  if ( not ptr ) throw -1;
+  if ( !ptr ) throw -1;
   return (*ptr) >> value;
 }
 
@@ -177,7 +177,7 @@ template <typename T>
 inline
 DBus::Message::append_iterator operator<<( DBus::Message::pointer ptr, const T& value )
 {
-  if ( not ptr ) throw -1;
+  if ( !ptr ) throw -1;
   return (*ptr) << value;
 }
 

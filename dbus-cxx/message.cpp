@@ -52,7 +52,7 @@ namespace DBus
 
   Message::Message( Message::pointer other, CreateMethod m ): m_cobj(NULL), m_valid(false)
   {
-    if ( other and other->m_cobj != NULL )
+    if ( other && other->m_cobj != NULL )
     {
       if ( m == CREATE_ALIAS )
       {
@@ -68,7 +68,7 @@ namespace DBus
 
   Message::Message( Message::const_pointer other, CreateMethod m ): m_cobj(NULL), m_valid(false)
   {
-    if ( other and other->m_cobj != NULL )
+    if ( other && other->m_cobj != NULL )
     {
       if ( m == CREATE_ALIAS )
       {
@@ -110,10 +110,10 @@ namespace DBus
 
   ReturnMessage::pointer Message::create_reply() const
   {
-    if ( not this->is_valid() ) return ReturnMessage::pointer();
+    if ( !this->is_valid() ) return ReturnMessage::pointer();
     if ( this->type() != CALL_MESSAGE ) return ReturnMessage::pointer();
     DBusMessage* rmcobj = dbus_message_new_method_return( this->cobj() );
-    if ( not rmcobj ) return ReturnMessage::pointer();
+    if ( !rmcobj ) return ReturnMessage::pointer();
     //when we create a new return message, this will increment the ref count.
     //make sure to decrement our ref count, as we don't need it anymore in this object
     ReturnMessage::pointer rmPtr = ReturnMessage::create(rmcobj);

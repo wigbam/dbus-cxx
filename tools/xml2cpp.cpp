@@ -66,7 +66,7 @@ int main( int argc, const char** argv )
 
   while ( (c = poptGetNextOpt(opt_context)) >= 0) { }
 
-  if ( not (poptPeekArg(opt_context) == NULL) or not (make_proxy or make_adapter) or not xml_file )
+  if ( !(poptPeekArg(opt_context) == NULL) || !(make_proxy || make_adapter) || !xml_file )
   {
     poptPrintUsage(opt_context, stderr, 0);
     return 1;
@@ -154,28 +154,28 @@ return 0;
         std::string full_file_prefix = file_prefix;
         full_file_prefix += nodes[i].file_prefix;
         
-        if ( not proxy_h.empty() )
+        if ( !proxy_h.empty() )
         {
           filename = full_file_prefix + nodes[i].name_lower() + "_proxy.h";
           fout.open( filename.c_str(), std::ios_base::trunc );
           fout << proxy_h;
           fout.close();
         }
-        if ( not proxy_cpp.empty() )
+        if ( !proxy_cpp.empty() )
         {
           filename = full_file_prefix + nodes[i].name_lower() + "_proxy.cpp";
           fout.open( filename.c_str(), std::ios_base::trunc );
           fout << proxy_cpp;
           fout.close();
         }
-        if ( not adapter_h.empty() )
+        if ( !adapter_h.empty() )
         {
           filename = full_file_prefix + nodes[i].name_lower() + "_adapter.h";
           fout.open( filename.c_str(), std::ios_base::trunc );
           fout << adapter_h;
           fout.close();
         }
-        if ( not adapter_cpp.empty() )
+        if ( !adapter_cpp.empty() )
         {
           filename = full_file_prefix + nodes[i].name_lower() + "_adapter.cpp";
           fout.open( filename.c_str(), std::ios_base::trunc );
@@ -185,10 +185,10 @@ return 0;
       }
       else
       {
-        if ( not proxy_h.empty() )     std::cout << proxy_h     << std::endl;
-        if ( not proxy_cpp.empty() )   std::cout << proxy_cpp   << std::endl;
-        if ( not adapter_h.empty() )   std::cout << adapter_h   << std::endl;
-        if ( not adapter_cpp.empty() ) std::cout << adapter_cpp << std::endl;
+        if ( !proxy_h.empty() )     std::cout << proxy_h     << std::endl;
+        if ( !proxy_cpp.empty() )   std::cout << proxy_cpp   << std::endl;
+        if ( !adapter_h.empty() )   std::cout << adapter_h   << std::endl;
+        if ( !adapter_cpp.empty() ) std::cout << adapter_cpp << std::endl;
       }
     }
 

@@ -110,7 +110,7 @@ namespace DBus
   {
     bool result = true;
     
-    if ( not method ) return false;
+    if ( !method ) return false;
     
     // ========== WRITE LOCK ==========
     pthread_rwlock_wrlock( &m_methods_rwlock );
@@ -189,7 +189,7 @@ namespace DBus
   {
     bool result = false;
 
-    if ( not sig ) return false;
+    if ( !sig ) return false;
 
     SIMPLELOGGER_DEBUG("dbus.Interface", "Interface(" << this->name() << ")::add_signal (" << sig->name() << ")");
     
@@ -387,7 +387,7 @@ namespace DBus
 
     for ( ; current != upper; current++ )
     {
-      if ( current->second and current->second->handle_call_message( connection, message ) == HANDLED )
+      if ( current->second && current->second->handle_call_message( connection, message ) == HANDLED )
       {
         result = HANDLED;
         break;

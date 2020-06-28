@@ -42,7 +42,7 @@ int main()
     msg = conn->pop_message( );
 
     // loop again if we haven't got a message
-    if ( not msg ) {
+    if ( !msg ) {
       sleep( 1 );
       continue;
     }
@@ -57,7 +57,7 @@ void reply_to_method_call( DBus::CallMessage::pointer msg, DBus::Connection::poi
   DBus::ReturnMessage::pointer reply;
   double param1, param2, answer=NAN;
 
-  if ( not msg->has_interface("Calculator.Basic") ) return;
+  if ( !msg->has_interface("Calculator.Basic") ) return;
 
   // read the arguments
   if ( msg->begin() == msg->end() )
@@ -73,13 +73,13 @@ void reply_to_method_call( DBus::CallMessage::pointer msg, DBus::Connection::poi
   else if ( msg->is_call("Calculator.Basic", "mul") ) answer = param1 * param2;
   else if ( msg->is_call("Calculator.Basic", "div") ) answer = param1 / param2;
 
-  if ( not std::isnan(answer) )
+  if ( !std::isnan(answer) )
   {
     // create a reply from the message
     reply = msg->create_reply( );
 
     // Was the reply successfully created
-    if ( not reply ) return;
+    if ( !reply ) return;
     
     // add the arguments to the reply
     reply << answer;

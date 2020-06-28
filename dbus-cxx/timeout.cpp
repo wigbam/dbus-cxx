@@ -54,19 +54,19 @@ namespace DBus
 
   int Timeout::interval( ) const
   {
-    if ( not this->is_valid() ) throw ErrorInvalidCObject::create();
+    if ( !this->is_valid() ) throw ErrorInvalidCObject::create();
     return dbus_timeout_get_interval( m_cobj );
   }
 
   bool Timeout::is_enabled( ) const
   {
-    if ( not this->is_valid() ) throw ErrorInvalidCObject::create();
+    if ( !this->is_valid() ) throw ErrorInvalidCObject::create();
     return dbus_timeout_get_enabled( m_cobj );
   }
 
   bool Timeout::handle( )
   {
-    if ( not this->is_valid() ) throw ErrorInvalidCObject::create();
+    if ( !this->is_valid() ) throw ErrorInvalidCObject::create();
     return dbus_timeout_handle( m_cobj );
   }
 
@@ -85,7 +85,7 @@ namespace DBus
     std::unique_lock<std::mutex> lock( m_arming_mutex );
     if ( should_arm )
     {
-      if ( not m_is_armed )
+      if ( !m_is_armed )
       {
         struct sigevent sigevent = {{0},0};
 
@@ -137,7 +137,7 @@ namespace DBus
     Timeout* t;
     t = ( Timeout* ) sv.sival_ptr;
 
-    if ( t != NULL and t->is_valid() ) t->handle();
+    if ( t != NULL && t->is_valid() ) t->handle();
   }
 
 }

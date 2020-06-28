@@ -79,7 +79,7 @@ bool on_timeout()
   else
     std::cout << "." << std::flush;
       
-  if ( elapsed >= 20 and main_loop ) main_loop->quit();
+  if ( elapsed >= 20 && main_loop ) main_loop->quit();
 
   return true;
 }

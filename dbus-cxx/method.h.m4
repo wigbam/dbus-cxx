@@ -36,7 +36,7 @@ define([RETURN_TYPE],ifelse($3,[void],[void],[T_return]))dnl
     [DBUSCXX_DEBUG_STDSTR("dbus.Method", "Method<void, LOOP(T_arg%1, $1)>::handle_call_message method=" << m_name);],
     [DBUSCXX_DEBUG_STDSTR("dbus.Method", "Method<LIST(T_return, LOOP(T_arg%1, $1))>::handle_call_message   method=" << m_name );])
       
-    if ( not connection or not message ) return NOT_HANDLED;
+    if ( !connection || !message ) return NOT_HANDLED;
 
 ifelse(RETURN_TYPE,[void],,[dnl
     T_return _retval;
@@ -59,7 +59,7 @@ ifelse(eval($1>0),1,[dnl
       ifelse(RETURN_TYPE,[void],,[_retval = ])m_slot(LIST(LOOP(_val_%1, $1)));
       ReturnMessage::pointer retmsg = message->create_reply();
 
-      if ( not retmsg ) return NOT_HANDLED;
+      if ( !retmsg ) return NOT_HANDLED;
 
 ifelse(RETURN_TYPE,[void],,[dnl
       *retmsg << _retval;
@@ -70,7 +70,7 @@ ifelse(RETURN_TYPE,[void],,[dnl
     catch ( const std::exception &e ) {
       ErrorMessage::pointer errmsg = ErrorMessage::create( message, DBUS_ERROR_FAILED, e.what() );
 
-      if ( not errmsg ) return NOT_HANDLED;
+      if ( !errmsg ) return NOT_HANDLED;
 
       connection->send(errmsg);
     }
@@ -80,7 +80,7 @@ ifelse(RETURN_TYPE,[void],,[dnl
            DBUS_CXX_PACKAGE_MINOR_VERSION << "." << DBUS_CXX_PACKAGE_MICRO_VERSION << " unknown error.";
       ErrorMessage::pointer errmsg = ErrorMessage::create( message, DBUS_ERROR_FAILED, stream.str() );
 
-      if ( not errmsg ) return NOT_HANDLED;
+      if ( !errmsg ) return NOT_HANDLED;
 
       connection->send(errmsg);
     }

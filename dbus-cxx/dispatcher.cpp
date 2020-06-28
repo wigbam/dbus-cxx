@@ -93,7 +93,7 @@ namespace DBus
   
   bool Dispatcher::add_connection( Connection::pointer connection )
   {
-    if ( not connection or not connection->is_valid() ) return false;
+    if ( !connection || !connection->is_valid() ) return false;
     
     m_connections.push_back(connection);
     
@@ -138,7 +138,7 @@ namespace DBus
 
   bool Dispatcher::stop()
   {
-    if ( not m_running ) return false;
+    if ( !m_running ) return false;
 
     m_running = false;
     
@@ -292,7 +292,7 @@ namespace DBus
 
   bool Dispatcher::on_add_watch(Watch::pointer watch)
   {
-    if ( not watch or not watch->is_valid() ){ 
+    if ( !watch || !watch->is_valid() ){
       SIMPLELOGGER_ERROR( "dbus.Dispatcher", "Tried to add invalid watch" );
       return false;
     }
@@ -316,7 +316,7 @@ namespace DBus
 
   bool Dispatcher::on_remove_watch(Watch::pointer watch)
   {
-    if ( not watch or not watch->is_valid() ){
+    if ( !watch || !watch->is_valid() ){
       SIMPLELOGGER_ERROR( "dbus.Dispatcher", "Tried to remove invalid watch" );
       return false;
     }
@@ -347,7 +347,7 @@ namespace DBus
 
   void Dispatcher::on_watch_toggled(Watch::pointer watch)
   {
-    if ( not watch or not watch->is_valid() ) return;
+    if ( !watch || !watch->is_valid() ) return;
 
     SIMPLELOGGER_DEBUG( "dbus.Dispatcher", "toggle watch  fd:" << watch->unix_fd() << "  enabled: " << watch->is_enabled() );
 
@@ -358,7 +358,7 @@ namespace DBus
 
   bool Dispatcher::on_add_timeout(Timeout::pointer timeout)
   {
-    if ( not timeout or not timeout->is_valid() ) return false;
+    if ( !timeout || !timeout->is_valid() ) return false;
     
     SIMPLELOGGER_DEBUG( "dbus.Dispatcher", "add timeout  enabled:" << timeout->is_enabled() << "  interval: " << timeout->interval() );
     return true;
@@ -366,7 +366,7 @@ namespace DBus
 
   bool Dispatcher::on_remove_timeout(Timeout::pointer timeout)
   {
-    if ( not timeout or not timeout->is_valid() ) return false;
+    if ( !timeout || !timeout->is_valid() ) return false;
     
     SIMPLELOGGER_DEBUG( "dbus.Dispatcher", "remove timeout  enabled:" << timeout->is_enabled() << "  interval: " << timeout->interval() );
     return true;
@@ -374,7 +374,7 @@ namespace DBus
 
   bool Dispatcher::on_timeout_toggled(Timeout::pointer timeout)
   {
-    if ( not timeout or not timeout->is_valid() ) return false;
+    if ( !timeout || !timeout->is_valid() ) return false;
     
     SIMPLELOGGER_DEBUG( "dbus.Dispatcher", "timeout toggled  enabled:" << timeout->is_enabled() << "  interval: " << timeout->interval() );
     return true;

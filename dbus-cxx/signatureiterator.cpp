@@ -69,7 +69,7 @@ namespace DBus
 
   bool SignatureIterator::is_valid() const
   {
-    return ( m_valid and this->type() != TYPE_INVALID );
+    return ( m_valid && this->type() != TYPE_INVALID );
   }
 
   SignatureIterator::operator bool() const
@@ -79,13 +79,13 @@ namespace DBus
 
   bool SignatureIterator::next()
   {
-    if ( not this->is_valid() ) return false;
+    if ( !this->is_valid() ) return false;
 
     bool result;
 
     result = dbus_signature_iter_next( & m_cobj );
 
-    if ( not result or this->type() == TYPE_INVALID )
+    if ( !result || this->type() == TYPE_INVALID )
     {
       this->invalidate();
       return false;
@@ -115,7 +115,7 @@ namespace DBus
 
   Type SignatureIterator::type() const
   {
-    if ( not m_valid ) return TYPE_INVALID;
+    if ( !m_valid ) return TYPE_INVALID;
     
     return checked_type_cast( dbus_signature_iter_get_current_type(& m_cobj) );
   }
@@ -155,7 +155,7 @@ namespace DBus
   {
     SignatureIterator subiter;
 
-    if ( not this->is_container() ) return subiter;
+    if ( !this->is_container() ) return subiter;
     
     dbus_signature_iter_recurse( & m_cobj, & ( subiter.m_cobj ) );
 

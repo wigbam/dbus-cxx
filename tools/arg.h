@@ -55,7 +55,7 @@ public:
   DBus::Type type();
   std::string strfmt(int depth=0);
 
-  bool need_iterator_support() { return not cpp_type_override.empty(); }
+  bool need_iterator_support() { return !cpp_type_override.empty(); }
   std::pair<std::string,std::string> iterator_support() { return std::make_pair(cpp_type(ADAPTER_RET), cpp_dbus_type()); }
 
   void set_dbus_name( std::string );

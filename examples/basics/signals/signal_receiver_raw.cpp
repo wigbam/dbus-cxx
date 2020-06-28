@@ -46,7 +46,7 @@ int main()
     msg = connection->pop_message();
 
     // loop again if we haven't read a message
-    if ( not msg or not msg->is_valid() ) {
+    if ( !msg || !msg->is_valid() ) {
       sleep( 1 );
       continue;
     }

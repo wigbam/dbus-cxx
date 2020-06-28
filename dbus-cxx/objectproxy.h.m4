@@ -33,7 +33,7 @@ define([CREATE_METHOD],[dnl
       create_method( const std::string& interface_name, const std::string& method_name )
       {
         InterfaceProxy::pointer interface = this->interface(interface_name);
-        if ( not interface ) interface = this->create_interface( interface_name );
+        if ( !interface ) interface = this->create_interface( interface_name );
         return interface->create_method<LIST(T_return, LOOP(T_arg%1, $1))>(method_name);
       }
 
@@ -51,7 +51,7 @@ define([CREATE_SIGNAL],[dnl
       create_signal( const std::string& interface_name, const std::string& sig_name )
       {
         InterfaceProxy::pointer interface = this->interface(interface_name);
-        if ( not interface ) interface = this->create_interface( interface_name );
+        if ( !interface ) interface = this->create_interface( interface_name );
         return interface->create_signal<LIST(T_return, LOOP(T_arg%1, $1))>(sig_name);
       }
 

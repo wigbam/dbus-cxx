@@ -24,7 +24,7 @@ std::string Arg::cpp_type(ProxyAdapter pa)
   
   if ( cpp_type_override.empty() ){
     //type = cppTypeFromSignature( signature );
-    if ( not signature.begin().is_basic() ){
+    if ( !signature.begin().is_basic() ){
       std::string complexType;
       DBus::Signature::iterator it = signature.begin().recurse();
       typestr += type_string_from_code( signature.begin().type() );
@@ -48,8 +48,8 @@ std::string Arg::cpp_type(ProxyAdapter pa)
     }
   }else typestr = cpp_type_override;
 
-  if ( pa == PROXY_PARAM and mis_const ) typestr = "const " + typestr;
-  if ( pa == PROXY_PARAM and mis_ref )   typestr = typestr + "&";
+  if ( pa == PROXY_PARAM && mis_const ) typestr = "const " + typestr;
+  if ( pa == PROXY_PARAM && mis_ref )   typestr = typestr + "&";
 
   return typestr;
 }
@@ -124,8 +124,8 @@ std::string Arg::stubsignature()
 
 DBus::Type Arg::type()
 {
-  if ( not signature.is_singleton() ) return DBus::TYPE_INVALID;
-  //if ( not signature.begin().is_basic() ) return DBus::TYPE_INVALID;
+  if ( !signature.is_singleton() ) return DBus::TYPE_INVALID;
+  //if ( !signature.begin().is_basic() ) return DBus::TYPE_INVALID;
   return signature.begin().type();
 }
 

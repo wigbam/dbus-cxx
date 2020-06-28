@@ -102,7 +102,7 @@ namespace DBus
         T type;
         success = this->open_container( CONTAINER_ARRAY, DBus::signature(type).c_str() );
 
-        if( not success ){
+        if( !success ){
           throw ErrorNoMemory::create();
         }
 

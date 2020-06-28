@@ -54,7 +54,7 @@ namespace DBus
 
   HandlerResult signal_proxy_base::handle_signal( SignalMessage::const_pointer msg )
   {
-    if ( not this->matches( msg ) ) return NOT_HANDLED;
+    if ( !this->matches( msg ) ) return NOT_HANDLED;
 
     return m_signal_dbus_incoming.emit( msg );
   }
@@ -66,39 +66,39 @@ namespace DBus
 
   const std::string & signal_proxy_base::match_rule()
   {
-    if ( m_interface.empty() or m_name.empty() ) {
+    if ( m_interface.empty() || m_name.empty() ) {
       m_match_rule = std::string();
       return m_match_rule;
     }
     m_match_rule = "type='signal'";
     m_match_rule += ",interface='"   + m_interface   + "'";
     m_match_rule += ",member='"      + m_name      + "'";
-    if ( not m_sender.empty() )      m_match_rule += ",sender='"      + m_sender      + "'";
-    if ( not m_path.empty() )        m_match_rule += ",path='"        + m_path        + "'";
-    if ( not m_destination.empty() ) m_match_rule += ",destination='" + m_destination + "'";
+    if ( !m_sender.empty() )      m_match_rule += ",sender='"      + m_sender      + "'";
+    if ( !m_path.empty() )        m_match_rule += ",path='"        + m_path        + "'";
+    if ( !m_destination.empty() ) m_match_rule += ",destination='" + m_destination + "'";
     return m_match_rule;
   }
 
   bool signal_proxy_base::matches( Message::const_pointer msg )
   {
-    if ( not msg or not msg->is_valid() ) return false;
+    if ( !msg || !msg->is_valid() ) return false;
     if ( msg->type() != SIGNAL_MESSAGE ) return false;
-    if ( m_interface.empty() or m_name.empty() ) return false;
+    if ( m_interface.empty() || m_name.empty() ) return false;
 
     SignalMessage::const_pointer smsg;
     smsg = dbus_cxx_dynamic_pointer_cast<const SignalMessage>( msg );
 
-    if ( not smsg ) smsg = SignalMessage::create( msg );
+    if ( !smsg ) smsg = SignalMessage::create( msg );
 
     if ( m_interface != smsg->interface() ) return false;
 
     if ( m_name != smsg->member() ) return false;
 
-    if ( not m_sender.empty() and m_sender != smsg->sender() ) return false;
+    if ( !m_sender.empty() && m_sender != smsg->sender() ) return false;
 
-    if ( not m_destination.empty() and m_destination != smsg->destination() ) return false;
+    if ( !m_destination.empty() && m_destination != smsg->destination() ) return false;
 
-    if ( not m_path.empty() and m_path != smsg->path() ) return false;
+    if ( !m_path.empty() && m_path != smsg->path() ) return false;
 
     return true;
   }

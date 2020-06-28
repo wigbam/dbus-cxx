@@ -67,7 +67,7 @@
     }                                                                                                                                                             \
   }                                                                                                                                                               \
                                                                                                                                                                   \
-  if ( not valid_op ) {                                                                                                                                           \
+  if ( !valid_op ) {                                                                                                                                              \
     fprintf( stderr, "ERROR: Operation '%s' is invalid.\n\nOperation is case sensitive and must be one of:\n", op );                                              \
     for ( int i=0; i < 9; i++ ) fprintf( stderr, "\t%s\n", valid_ops[i] );                                                                                        \
     return 1;                                                                                                                                                     \

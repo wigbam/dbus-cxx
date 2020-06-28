@@ -49,19 +49,19 @@ namespace DBus
 
   int Watch::unix_fd( ) const
   {
-    if ( not this->is_valid() ) throw ErrorInvalidCObject::create();
+    if ( !this->is_valid() ) throw ErrorInvalidCObject::create();
     return dbus_watch_get_unix_fd( m_cobj );
   }
 
   int Watch::socket( ) const
   {
-    if ( not this->is_valid() ) throw ErrorInvalidCObject::create();
+    if ( !this->is_valid() ) throw ErrorInvalidCObject::create();
     return dbus_watch_get_socket( m_cobj );
   }
 
   unsigned int Watch::flags( ) const
   {
-    if ( not this->is_valid() ) return WATCH_ERROR;
+    if ( !this->is_valid() ) return WATCH_ERROR;
     return dbus_watch_get_flags( m_cobj );
   }
 
@@ -77,13 +77,13 @@ namespace DBus
 
   bool Watch::is_enabled( ) const
   {
-    if ( not this->is_valid() ) throw ErrorInvalidCObject::create();
+    if ( !this->is_valid() ) throw ErrorInvalidCObject::create();
     return dbus_watch_get_enabled( m_cobj );
   }
 
   bool Watch::handle( unsigned int flags )
   {
-    if ( not this->is_valid() ) throw ErrorInvalidCObject::create();
+    if ( !this->is_valid() ) throw ErrorInvalidCObject::create();
     return dbus_watch_handle( m_cobj, flags );
   }
 

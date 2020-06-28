@@ -53,10 +53,10 @@ namespace DBus
 	if (!result) throw std::bad_alloc();
 
         result = dbus_connection_allocate_data_slot( & Connection::m_weak_pointer_slot );
-        if ( not result ) throw ErrorFailed::create(); 
+        if ( !result ) throw ErrorFailed::create();
     }else{
         result = dbus_connection_allocate_data_slot( & Connection::m_weak_pointer_slot );
-        if ( not result ) throw ErrorFailed::create(); 
+        if ( !result ) throw ErrorFailed::create();
     }
 
     initialized_var = true;

@@ -45,7 +45,7 @@ namespace DBus
     if ( msg->type() != CALL_MESSAGE )
       throw ErrorInvalidMessageType::create();
 
-    if ( msg and *msg )
+    if ( msg && *msg )
     {
       m_cobj = msg->cobj();
       dbus_message_ref( m_cobj );
@@ -57,7 +57,7 @@ namespace DBus
     if ( msg->type() != CALL_MESSAGE )
       throw ErrorInvalidMessageType::create();
 
-    if ( msg and *msg )
+    if ( msg && *msg )
     {
       m_cobj = msg->cobj();
       dbus_message_ref( m_cobj );
