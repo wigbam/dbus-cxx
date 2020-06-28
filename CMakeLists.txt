@@ -16,13 +16,27 @@ project( dbus-cxx )
 
 cmake_minimum_required( VERSION 3.1 )
 
+#
+# Check our options
+#
+option( ENABLE_TESTS "Enable the unit tests" OFF )
+option( ENABLE_EXAMPLES "Enable the examples" OFF )
+option( ENABLE_TOOLS "Enable dbus-cxx tools" OFF )
+option( ENABLE_GLIBMM "Enable GLibMM support" OFF )
+option( BUILD_SITE "Build the dbus-cxx website reference" OFF )
+option( TOOLS_BUNDLED_CPPGENERATE "Use bundled libcppgenerate" ON )
+option( ENABLE_CODE_COVERAGE_REPORT "Enable code coverage report" OFF )
+
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake-modules")
 
 include( CheckIncludeFiles )
 include( GNUInstallDirs )
 include( FindPkgConfig )
 include( CheckTypeSize )
-include( CodeCoverage )
+
+if( ENABLE_CODE_COVERAGE_REPORT )
+    include( CodeCoverage )
+endif( ENABLE_CODE_COVERAGE_REPORT )
 
 # version information
 set( DBUS_CXX_PACKAGE_MAJOR_VERSION 0 )
@@ -38,17 +52,6 @@ pkg_check_modules( sigc REQUIRED sigc++-2.0 )
 # Dbus-cxx requires at least C++11
 set( CMAKE_CXX_STANDARD 11 )
 set( CMAKE_CXX_STANDARD_REQUIRED ON )
-
-#
-# Check our options
-#
-option( ENABLE_TESTS "Enable the unit tests" OFF )
-option( ENABLE_EXAMPLES "Enable the examples" OFF )
-option( ENABLE_TOOLS "Enable dbus-cxx tools" OFF )
-option( ENABLE_GLIBMM "Enable GLibMM support" OFF )
-option( BUILD_SITE "Build the dbus-cxx website reference" OFF )
-option( TOOLS_BUNDLED_CPPGENERATE "Use bundled libcppgenerate" ON )
-option( ENABLE_CODE_COVERAGE_REPORT "Enable code coverage report" OFF )
 
 #
 # Configure our compile options
