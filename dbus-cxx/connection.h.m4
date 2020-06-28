@@ -24,10 +24,10 @@ include(template.macros.m4)
 define([CREATE_SIGNAL_PROXY_IN],[dnl
       dnl
 template <LIST(class T_return, LOOP(class T_arg%1, [$1]))>
-      DBusCxxPointer<signal_proxy<LIST(T_return, LOOP(T_arg%1, $1))> > create_signal_proxy( const std::string& interface, const std::string& name )
+      DBusCxxPointer<signal_proxy<LIST(T_return, LOOP(T_arg%1, $1))> > create_signal_proxy( const std::string& interface_name, const std::string& name )
       {
         DBusCxxPointer<signal_proxy<LIST(T_return, LOOP(T_arg%1, $1))> > sig;
-        sig = signal_proxy<LIST(T_return, LOOP(T_arg%1, $1))>::create(interface, name);
+        sig = signal_proxy<LIST(T_return, LOOP(T_arg%1, $1))>::create(interface_name, name);
         this->add_signal_proxy( sig );
         return sig;
       }
@@ -37,10 +37,10 @@ template <LIST(class T_return, LOOP(class T_arg%1, [$1]))>
 define([CREATE_SIGNAL_PROXY_PIN],[dnl
       dnl
 template <LIST(class T_return, LOOP(class T_arg%1, [$1]))>
-      DBusCxxPointer<signal_proxy<LIST(T_return, LOOP(T_arg%1, $1))> > create_signal_proxy( const std::string& path, const std::string& interface, const std::string& name )
+      DBusCxxPointer<signal_proxy<LIST(T_return, LOOP(T_arg%1, $1))> > create_signal_proxy( const std::string& path, const std::string& interface_name, const std::string& name )
       {
         DBusCxxPointer<signal_proxy<LIST(T_return, LOOP(T_arg%1, $1))> > sig;
-        sig = signal_proxy<LIST(T_return, LOOP(T_arg%1, $1))>::create(path, interface, name);
+        sig = signal_proxy<LIST(T_return, LOOP(T_arg%1, $1))>::create(path, interface_name, name);
         this->add_signal_proxy( sig );
         return sig;
       }
@@ -50,10 +50,10 @@ template <LIST(class T_return, LOOP(class T_arg%1, [$1]))>
 define([CREATE_SIGNAL_IN],[dnl
       dnl
 template <LIST(class T_return, LOOP(class T_arg%1, [$1]))>
-      DBusCxxPointer<signal<LIST(T_return, LOOP(T_arg%1, $1))> > create_signal( const std::string& interface, const std::string& name )
+      DBusCxxPointer<signal<LIST(T_return, LOOP(T_arg%1, $1))> > create_signal( const std::string& interface_name, const std::string& name )
       {
         DBusCxxPointer<signal<LIST(T_return, LOOP(T_arg%1, $1))> > sig;
-        sig = signal<LIST(T_return, LOOP(T_arg%1, $1))>::create(interface, name);
+        sig = signal<LIST(T_return, LOOP(T_arg%1, $1))>::create(interface_name, name);
         sig->set_connection(this->self());
         return sig;
       }
@@ -63,10 +63,10 @@ template <LIST(class T_return, LOOP(class T_arg%1, [$1]))>
 define([CREATE_SIGNAL_PIN],[dnl
       dnl
 template <LIST(class T_return, LOOP(class T_arg%1, [$1]))>
-      DBusCxxPointer<signal<LIST(T_return, LOOP(T_arg%1, $1))> > create_signal( const std::string& path, const std::string& interface, const std::string& name )
+      DBusCxxPointer<signal<LIST(T_return, LOOP(T_arg%1, $1))> > create_signal( const std::string& path, const std::string& interface_name, const std::string& name )
       {
         DBusCxxPointer<signal<LIST(T_return, LOOP(T_arg%1, $1))> > sig;
-        sig = signal<LIST(T_return, LOOP(T_arg%1, $1))>::create(path, interface, name);
+        sig = signal<LIST(T_return, LOOP(T_arg%1, $1))>::create(path, interface_name, name);
         sig->set_connection(this->self());
         return sig;
       }
@@ -356,14 +356,14 @@ namespace DBus
        *
        * @return Smart pointer to the newly added signal or a null smart pointer if it couldn't be added
        */
-      signal_proxy_simple::pointer create_signal_proxy( const std::string& interface, const std::string& name );
+      signal_proxy_simple::pointer create_signal_proxy( const std::string& interface_name, const std::string& name );
 
       /**
        * Adds a signal with the given path, interface and name
        *
        * @return Smart pointer to the newly added signal or a null smart pointer if it couldn't be added
        */
-      signal_proxy_simple::pointer create_signal_proxy( const std::string& path, const std::string& interface, const std::string& name );
+      signal_proxy_simple::pointer create_signal_proxy( const std::string& path, const std::string& interface_name, const std::string& name );
 
 FOR(0, eval(CALL_SIZE),[[CREATE_SIGNAL_PROXY_IN(%1)
 ]])
@@ -388,10 +388,10 @@ FOR(0, eval(CALL_SIZE),[[CREATE_SIGNAL_PROXY_PIN(%1)
       const InterfaceToNameProxySignalMap& get_signal_proxies();
 
       /** Gets the signal handlers for a specific interface */
-      NameToProxySignalMap get_signal_proxies( const std::string& interface );
+      NameToProxySignalMap get_signal_proxies( const std::string& interface_name );
 
       /** Gets the signal handlers for a specific interface and member */
-      ProxySignals get_signal_proxies( const std::string& interface, const std::string& member );
+      ProxySignals get_signal_proxies( const std::string& interface_name, const std::string& member );
 
 FOR(0, eval(CALL_SIZE),[[CREATE_SIGNAL_IN(%1)
 ]])

@@ -119,9 +119,9 @@ namespace DBus
 
       const char* sender() const;
 
-      bool is_call( const std::string& interface, const std::string& method ) const;
+      bool is_call( const std::string& interface_name, const std::string& method ) const;
 
-      bool is_signal( const std::string& interface, const std::string& signal_name ) const;
+      bool is_signal( const std::string& interface_name, const std::string& signal_name ) const;
 
       bool is_error( const std::string& error_name ) const;
 

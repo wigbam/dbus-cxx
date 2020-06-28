@@ -32,9 +32,9 @@ define([CREATE_METHOD],[dnl
       DBusCxxPointer<MethodProxy<LIST(T_return, LOOP(T_arg%1, $1))> >
       create_method( const std::string& interface_name, const std::string& method_name )
       {
-        InterfaceProxy::pointer interface = this->interface(interface_name);
-        if ( !interface ) interface = this->create_interface( interface_name );
-        return interface->create_method<LIST(T_return, LOOP(T_arg%1, $1))>(method_name);
+        InterfaceProxy::pointer iface = this->iface(interface_name);
+        if ( !iface ) iface = this->create_interface( interface_name );
+        return iface->create_method<LIST(T_return, LOOP(T_arg%1, $1))>(method_name);
       }
 
 ])
@@ -50,9 +50,9 @@ define([CREATE_SIGNAL],[dnl
       DBusCxxPointer<signal_proxy<LIST(T_return, LOOP(T_arg%1, $1))> >
       create_signal( const std::string& interface_name, const std::string& sig_name )
       {
-        InterfaceProxy::pointer interface = this->interface(interface_name);
-        if ( !interface ) interface = this->create_interface( interface_name );
-        return interface->create_signal<LIST(T_return, LOOP(T_arg%1, $1))>(sig_name);
+        InterfaceProxy::pointer iface = this->iface(interface_name);
+        if ( !iface ) iface = this->create_interface( interface_name );
+        return iface->create_signal<LIST(T_return, LOOP(T_arg%1, $1))>(sig_name);
       }
 
 ])
@@ -286,13 +286,13 @@ namespace DBus
       const Interfaces& interfaces() const;
 
       /** Returns the first interface with the given name */
-      InterfaceProxy::pointer interface( const std::string& name ) const;
+      InterfaceProxy::pointer iface( const std::string& name ) const;
 
-      /** Alias for interface(name) */
+      /** Alias for iface(name) */
       InterfaceProxy::pointer operator[[]]( const std::string& name ) const;
 
       /** Adds the interface to this object */
-      bool add_interface( InterfaceProxy::pointer interface );
+      bool add_interface( InterfaceProxy::pointer iface );
 
       /**
        * Creates and adds the named interface to this object
@@ -305,11 +305,11 @@ namespace DBus
       void remove_interface( const std::string& name );
 
       /** Removes the given interface */
-      void remove_interface( InterfaceProxy::pointer interface );
+      void remove_interface( InterfaceProxy::pointer iface );
 
       bool has_interface( const std::string& name ) const;
 
-      bool has_interface( InterfaceProxy::pointer interface ) const;
+      bool has_interface( InterfaceProxy::pointer iface ) const;
 
       InterfaceProxy::pointer default_interface() const;
 
@@ -320,7 +320,7 @@ namespace DBus
       void remove_default_interface();
 
       /** Adds the method to the named interface */
-      bool add_method( const std::string& interface, MethodProxyBase::pointer method );
+      bool add_method( const std::string& interface_name, MethodProxyBase::pointer method );
 
       /** Adds the method to the default interface */
       bool add_method( MethodProxyBase::pointer method );
@@ -367,7 +367,7 @@ FOR(0, eval(CALL_SIZE),[[CREATE_SIGNAL(%1)]])
 
       InterfaceSignalNameConnections m_interface_signal_name_connections;
 
-      void on_interface_name_changed(const std::string& oldname, const std::string& newname, InterfaceProxy::pointer interface);
+      void on_interface_name_changed(const std::string& oldname, const std::string& newname, InterfaceProxy::pointer iface);
 
   };
 

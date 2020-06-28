@@ -25,30 +25,30 @@
 namespace DBus
 {
 
-  signal_base::signal_base(const std::string& path, const std::string& interface, const std::string& name):
+  signal_base::signal_base(const std::string& path, const std::string& interface_name, const std::string& name):
       m_path(path),
-      m_interface(interface),
+      m_interface(interface_name),
       m_name(name)
   {
   }
 
-  signal_base::signal_base(const std::string& interface, const std::string& name):
-      m_interface(interface),
+  signal_base::signal_base(const std::string& interface_name, const std::string& name):
+      m_interface(interface_name),
       m_name(name)
   {
   }
 
-  signal_base::signal_base(Connection::pointer connection, const std::string& path, const std::string& interface, const std::string& name):
+  signal_base::signal_base(Connection::pointer connection, const std::string& path, const std::string& interface_name, const std::string& name):
       m_connection(connection),
       m_path(path),
-      m_interface(interface),
+      m_interface(interface_name),
       m_name(name)
   {
   }
 
-  signal_base::signal_base(Connection::pointer connection, const std::string& interface, const std::string& name):
+  signal_base::signal_base(Connection::pointer connection, const std::string& interface_name, const std::string& name):
       m_connection(connection),
-      m_interface(interface),
+      m_interface(interface_name),
       m_name(name)
   {
   }
@@ -86,7 +86,7 @@ namespace DBus
     m_sender = s;
   }
 
-  const std::string & signal_base::interface() const
+  const std::string & signal_base::interface_name() const
   {
     return m_interface;
   }

@@ -47,7 +47,7 @@ namespace DBus
 
       SignalMessage( const std::string& name );
 
-      SignalMessage( const std::string& path, const std::string& interface, const std::string& name );
+      SignalMessage( const std::string& path, const std::string& interface_name, const std::string& name );
 
     public:
 
@@ -65,7 +65,7 @@ namespace DBus
 
       static pointer create( const std::string& name );
 
-      static pointer create( const std::string& path, const std::string& interface, const std::string& name );
+      static pointer create( const std::string& path, const std::string& interface_name, const std::string& name );
 
       bool set_path( const std::string& p );
 
@@ -77,7 +77,7 @@ namespace DBus
 
       bool set_interface( const std::string& i );
 
-      const char* interface() const;
+      const char* interface_name() const;
 
       bool has_interface( const std::string& i ) const;
 

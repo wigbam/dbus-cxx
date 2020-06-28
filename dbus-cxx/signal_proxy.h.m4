@@ -49,35 +49,35 @@ class signal_proxy ifelse($1, $2,,[<LIST(T_return, LOOP(T_arg%1,$1), LOOP(nil, C
 
     typedef DBusCxxPointer<signal_proxy> pointer;
   
-    signal_proxy(const std::string& interface, const std::string& name):
-      signal_proxy_base(interface, name)
+    signal_proxy(const std::string& interface_name, const std::string& name):
+      signal_proxy_base(interface_name, name)
     { m_signal_dbus_incoming.connect( sigc::mem_fun(*this, &signal_proxy::on_dbus_incoming) ); }
 
-    signal_proxy(const std::string& path, const std::string& interface, const std::string& name):
-      signal_proxy_base(path, interface, name)
+    signal_proxy(const std::string& path, const std::string& interface_name, const std::string& name):
+      signal_proxy_base(path, interface_name, name)
     { m_signal_dbus_incoming.connect( sigc::mem_fun(*this, &signal_proxy::on_dbus_incoming) ); }
 
-    signal_proxy(const std::string& interface, const std::string& name, const signal_proxy& src) :
+    signal_proxy(const std::string& interface_name, const std::string& name, const signal_proxy& src) :
       sigc::signal<LIST(T_return, LOOP(T_arg%1, $1))>(src),
-      signal_proxy_base(interface, name)
+      signal_proxy_base(interface_name, name)
     { m_signal_dbus_incoming.connect( sigc::mem_fun(*this, &signal_proxy::on_dbus_incoming) ); }
 
-    signal_proxy(const std::string& path, const std::string& interface, const std::string& name, const signal_proxy& src) :
+    signal_proxy(const std::string& path, const std::string& interface_name, const std::string& name, const signal_proxy& src) :
       sigc::signal<LIST(T_return, LOOP(T_arg%1, $1))>(src),
-      signal_proxy_base(path, interface, name)
+      signal_proxy_base(path, interface_name, name)
     { m_signal_dbus_incoming.connect( sigc::mem_fun(*this, &signal_proxy::on_dbus_incoming) ); }
 
-    static pointer create(const std::string& interface, const std::string& name)
-    { return pointer( new signal_proxy(interface, name) ); }
+    static pointer create(const std::string& interface_name, const std::string& name)
+    { return pointer( new signal_proxy(interface_name, name) ); }
 
-    static pointer create(const std::string& path, const std::string& interface, const std::string& name)
-    { return pointer( new signal_proxy(path, interface, name) ); }
+    static pointer create(const std::string& path, const std::string& interface_name, const std::string& name)
+    { return pointer( new signal_proxy(path, interface_name, name) ); }
 
-    static pointer create(const std::string& interface, const std::string& name, const signal_proxy& src)
-    { return pointer( new signal_proxy(interface, name, src) ); }
+    static pointer create(const std::string& interface_name, const std::string& name, const signal_proxy& src)
+    { return pointer( new signal_proxy(interface_name, name, src) ); }
 
-    static pointer create(const std::string& path, const std::string& interface, const std::string& name, const signal_proxy& src)
-    { return pointer( new signal_proxy(path, interface, name, src) ); }
+    static pointer create(const std::string& path, const std::string& interface_name, const std::string& name, const signal_proxy& src)
+    { return pointer( new signal_proxy(path, interface_name, name, src) ); }
 
     virtual signal_base::pointer clone()
     { return signal_base::pointer( new signal_proxy(*this) ); }

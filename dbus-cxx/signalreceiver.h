@@ -43,7 +43,7 @@ namespace DBus
   class SignalReceiver : public MessageHandler
   {
     protected:
-      SignalReceiver(const std::string& path, const std::string& interface, const std::string& member);
+      SignalReceiver(const std::string& path, const std::string& interface_name, const std::string& member);
 
     public:
 
@@ -51,9 +51,9 @@ namespace DBus
 
       typedef DBusCxxWeakPointer<SignalReceiver> weak_pointer;
 
-      static pointer create(const std::string& interface, const std::string& member);
+      static pointer create(const std::string& interface_name, const std::string& member);
 
-      static pointer create(const std::string& path, const std::string& interface, const std::string& member);
+      static pointer create(const std::string& path, const std::string& interface_name, const std::string& member);
 
       ~SignalReceiver();
 
@@ -63,7 +63,7 @@ namespace DBus
 
       void set_sender(const std::string& s);
 
-      const std::string& interface();
+      const std::string& interface_name();
 
       void set_interface(const std::string& s);
 

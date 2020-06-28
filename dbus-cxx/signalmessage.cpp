@@ -48,9 +48,9 @@ namespace DBus
     this->set_member( name );
   }
 
-  SignalMessage::SignalMessage( const std::string& path, const std::string& interface, const std::string& name )
+  SignalMessage::SignalMessage( const std::string& path, const std::string& interface_name, const std::string& name )
   {
-    m_cobj = dbus_message_new_signal( path.c_str(), interface.c_str(), name.c_str() );
+    m_cobj = dbus_message_new_signal( path.c_str(), interface_name.c_str(), name.c_str() );
     if ( m_cobj == NULL )
       throw( ErrorNoMemory::create( "SignalMessage::SignalMessage: constructor failed because dbus couldn't allocate memory for signal" ) );
   }
@@ -81,14 +81,14 @@ namespace DBus
     return pointer( new SignalMessage(name) );
   }
 
-  SignalMessage::pointer SignalMessage::create(const std::string & path, const std::string & interface, const std::string & name)
+  SignalMessage::pointer SignalMessage::create(const std::string & path, const std::string & interface_name, const std::string & name)
   {
-    return pointer( new SignalMessage(path, interface, name) );
+    return pointer( new SignalMessage(path, interface_name, name) );
   }
 
   bool SignalMessage::operator == ( const SignalMessage& m ) const
   {
-    return dbus_message_is_signal( m_cobj, m.interface(), m.member() );
+    return dbus_message_is_signal( m_cobj, m.interface_name(), m.member() );
   }
 
   bool SignalMessage::set_path( const std::string& p )
@@ -122,7 +122,7 @@ namespace DBus
     return dbus_message_set_interface( m_cobj, i.c_str() );
   }
 
-  const char* SignalMessage::interface() const {
+  const char* SignalMessage::interface_name() const {
       return dbus_message_get_interface( m_cobj );
     }
 

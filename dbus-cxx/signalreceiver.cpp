@@ -24,22 +24,22 @@
 namespace DBus
 {
 
-  SignalReceiver::SignalReceiver(const std::string& path, const std::string& interface, const std::string& member):
+  SignalReceiver::SignalReceiver(const std::string& path, const std::string& interface_name, const std::string& member):
       MessageHandler(),
       m_path(path),
-      m_interface(interface),
+      m_interface(interface_name),
       m_member(member)
   {
   }
 
-  SignalReceiver::pointer SignalReceiver::create(const std::string & interface, const std::string & member)
+  SignalReceiver::pointer SignalReceiver::create(const std::string & interface_name, const std::string & member)
   {
-    return pointer( new SignalReceiver(std::string(), interface, member) );
+    return pointer( new SignalReceiver(std::string(), interface_name, member) );
   }
 
-  SignalReceiver::pointer SignalReceiver::create(const std::string & path, const std::string & interface, const std::string & member)
+  SignalReceiver::pointer SignalReceiver::create(const std::string & path, const std::string & interface_name, const std::string & member)
   {
-    return pointer( new SignalReceiver(path, interface, member) );
+    return pointer( new SignalReceiver(path, interface_name, member) );
   }
 
   SignalReceiver::~SignalReceiver()
@@ -66,7 +66,7 @@ namespace DBus
     m_signal_sender_changed.emit();
   }
 
-  const std::string & SignalReceiver::interface()
+  const std::string & SignalReceiver::interface_name()
   {
     return m_interface;
   }
@@ -162,7 +162,7 @@ namespace DBus
 
     if ( !smsg ) smsg = SignalMessage::create(msg);
 
-    if ( m_interface != smsg->interface() ) return false;
+    if ( m_interface != smsg->interface_name() ) return false;
     
     if ( m_member != smsg->member() ) return false;
 

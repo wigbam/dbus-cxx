@@ -68,8 +68,8 @@ public:
   //public:
   //  typedef DBusCxxPointer<accumulated> pointer;
   //
-  //  accumulated(const std::string& interface, const std::string& name):
-  //    signal_base(interface, name)
+  //  accumulated(const std::string& interface_name, const std::string& name):
+  //    signal_base(interface_name, name)
   //  {
   //    m_internal_callback_connection =
   //      this->connect( sigc::mem_fun(*this, &accumulated::internal_callback) );
@@ -77,8 +77,8 @@ public:
   //    m_signal_dbus_incoming.connect( sigc::mem_fun(*this, &accumulated::on_dbus_incoming) );
   //  }
 
-  //  accumulated(const std::string& path, const std::string& interface, const std::string& name):
-  //    signal_base(path, interface, name)
+  //  accumulated(const std::string& path, const std::string& interface_name, const std::string& name):
+  //    signal_base(path, interface_name, name)
   //  {
   //    m_internal_callback_connection =
   //      this->connect( sigc::mem_fun(*this, &accumulated::internal_callback) );
@@ -86,34 +86,34 @@ public:
   //    m_signal_dbus_incoming.connect( sigc::mem_fun(*this, &accumulated::on_dbus_incoming) );
   //  }
 
-  //  accumulated(const std::string& interface, const std::string& name, const accumulated& src):
+  //  accumulated(const std::string& interface_name, const std::string& name, const accumulated& src):
   //    sigc::signal$1<LIST(T_return, LOOP(T_arg%1, $1),T_accumulator)>(src),
-  //    signal_base(interface, name)
+  //    signal_base(interface_name, name)
   //  {}
 
-  //  accumulated(const std::string& path, const std::string& interface, const std::string& name, const accumulated& src):
+  //  accumulated(const std::string& path, const std::string& interface_name, const std::string& name, const accumulated& src):
   //    sigc::signal$1<LIST(T_return, LOOP(T_arg%1, $1),T_accumulator)>(src),
-  //    signal_base(path, interface, name)
+  //    signal_base(path, interface_name, name)
   //  {}
 
-  //  static pointer create(const std::string& interface, const std::string& name)
+  //  static pointer create(const std::string& interface_name, const std::string& name)
   //  {
-  //    return pointer( new accumulated(interface, name) );
+  //    return pointer( new accumulated(interface_name, name) );
   //  }
     
-  //  static pointer create(const std::string& path, const std::string& interface, const std::string& name)
+  //  static pointer create(const std::string& path, const std::string& interface_name, const std::string& name)
   //  {
-  //    return pointer( new accumulated(path, interface, name) );
+  //    return pointer( new accumulated(path, interface_name, name) );
   //  }
     
-  //  static pointer create(const std::string& interface, const std::string& name, const accumulated& src)
+  //  static pointer create(const std::string& interface_name, const std::string& name, const accumulated& src)
   //  {
-  //    return pointer( new accumulated(interface, name, src) );
+  //    return pointer( new accumulated(interface_name, name, src) );
   //  }
     
-  //  static pointer create(const std::string& path, const std::string& interface, const std::string& name, const accumulated& src)
+  //  static pointer create(const std::string& path, const std::string& interface_name, const std::string& name, const accumulated& src)
   //  {
-  //    return pointer( new accumulated(path, interface, name, src) );
+  //    return pointer( new accumulated(path, interface_name, name, src) );
   //  }
     
   //  virtual signal_base::pointer clone()
@@ -159,48 +159,48 @@ public:
 
   typedef DBusCxxPointer<signal> pointer;
   
-  signal(const std::string& interface, const std::string& name):
-    signal_base(interface, name)
+  signal(const std::string& interface_name, const std::string& name):
+    signal_base(interface_name, name)
   {
     m_internal_callback_connection =
       this->connect( sigc::mem_fun(*this, &signal::internal_callback) );
   }
   
-  signal(const std::string& path, const std::string& interface, const std::string& name):
-    signal_base(path, interface, name)
+  signal(const std::string& path, const std::string& interface_name, const std::string& name):
+    signal_base(path, interface_name, name)
   {
     m_internal_callback_connection =
       this->connect( sigc::mem_fun(*this, &signal::internal_callback) );
   }
   
-  signal(const std::string& interface, const std::string& name, const signal& src) :
+  signal(const std::string& interface_name, const std::string& name, const signal& src) :
     sigc::signal<LIST(T_return, LOOP(T_arg%1, $1))>(src),
-    signal_base(interface, name)
+    signal_base(interface_name, name)
   { }
 
-  signal(const std::string& path, const std::string& interface, const std::string& name, const signal& src) :
+  signal(const std::string& path, const std::string& interface_name, const std::string& name, const signal& src) :
     sigc::signal<LIST(T_return, LOOP(T_arg%1, $1))>(src),
-    signal_base(path, interface, name)
+    signal_base(path, interface_name, name)
   { }
 
-  static pointer create(const std::string& interface, const std::string& name)
+  static pointer create(const std::string& interface_name, const std::string& name)
   {
-    return pointer( new signal(interface, name) );
+    return pointer( new signal(interface_name, name) );
   }
 
-  static pointer create(const std::string& path, const std::string& interface, const std::string& name)
+  static pointer create(const std::string& path, const std::string& interface_name, const std::string& name)
   {
-    return pointer( new signal(path, interface, name) );
+    return pointer( new signal(path, interface_name, name) );
   }
 
-  static pointer create(const std::string& interface, const std::string& name, const signal& src)
+  static pointer create(const std::string& interface_name, const std::string& name, const signal& src)
   {
-    return pointer( new signal(interface, name, src) );
+    return pointer( new signal(interface_name, name, src) );
   }
 
-  static pointer create(const std::string& path, const std::string& interface, const std::string& name, const signal& src)
+  static pointer create(const std::string& path, const std::string& interface_name, const std::string& name, const signal& src)
   {
-    return pointer( new signal(path, interface, name, src) );
+    return pointer( new signal(path, interface_name, name, src) );
   }
 
   virtual signal_base::pointer clone()

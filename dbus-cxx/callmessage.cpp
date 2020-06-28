@@ -166,7 +166,7 @@ namespace DBus
     return dbus_message_set_interface( m_cobj, i.c_str() );
   }
 
-  const char* CallMessage::interface() const {
+  const char* CallMessage::interface_name() const {
       return dbus_message_get_interface( m_cobj );
     }
 
@@ -202,7 +202,7 @@ namespace DBus
 
   bool CallMessage::operator == ( const CallMessage& m ) const
   {
-    return dbus_message_is_method_call( m_cobj, m.interface(), m.member() );
+    return dbus_message_is_method_call( m_cobj, m.interface_name(), m.member() );
   }
 
   void CallMessage::set_no_reply( bool no_reply )

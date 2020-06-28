@@ -705,32 +705,32 @@ namespace DBus
     return false;
   }
 
-  signal_proxy_simple::pointer Connection::create_signal_proxy(const std::string & interface, const std::string & name)
+  signal_proxy_simple::pointer Connection::create_signal_proxy(const std::string & interface_name, const std::string & name)
   {
-    return this->add_signal_proxy( signal_proxy_simple::create(interface, name) );
+    return this->add_signal_proxy( signal_proxy_simple::create(interface_name, name) );
   }
 
-  signal_proxy_simple::pointer Connection::create_signal_proxy(const std::string& path, const std::string & interface, const std::string & name)
+  signal_proxy_simple::pointer Connection::create_signal_proxy(const std::string& path, const std::string & interface_name, const std::string & name)
   {
-    return this->add_signal_proxy( signal_proxy_simple::create(path, interface, name) );
+    return this->add_signal_proxy( signal_proxy_simple::create(path, interface_name, name) );
   }
 
   signal_proxy_base::pointer Connection::add_signal_proxy(signal_proxy_base::pointer signal)
   {
     if ( !signal ) return signal_proxy_base::pointer();
     
-    const std::string& interface = signal->interface();
+    const std::string& interface_name = signal->interface_name();
     const std::string& name = signal->name();
-    if ( interface.empty() || name.empty() ) return signal_proxy_base::pointer();
+    if ( interface_name.empty() || name.empty() ) return signal_proxy_base::pointer();
 
-    SIMPLELOGGER_DEBUG( "dbus.Connection", "Adding signal " << interface << ":" << name );
+    SIMPLELOGGER_DEBUG( "dbus.Connection", "Adding signal " << interface_name << ":" << name );
 
     if ( signal->connection() ) signal->connection()->remove_signal_proxy(signal);
 
     SIMPLELOGGER_DEBUG( "dbus.Connection", "m_proxy_signal_interface_map.size(): " << m_proxy_signal_interface_map.size() );
-    SIMPLELOGGER_DEBUG( "dbus.Connection", "m_proxy_signal_interface_map[" << interface << "].size(): " << m_proxy_signal_interface_map[interface].size() );
-    SIMPLELOGGER_DEBUG( "dbus.Connection", "m_proxy_signal_interface_map[" << interface << "][" << name << "].size(): " << m_proxy_signal_interface_map[interface][name].size() );
-    m_proxy_signal_interface_map[interface][name].push_back(signal);
+    SIMPLELOGGER_DEBUG( "dbus.Connection", "m_proxy_signal_interface_map[" << interface_name << "].size(): " << m_proxy_signal_interface_map[interface_name].size() );
+    SIMPLELOGGER_DEBUG( "dbus.Connection", "m_proxy_signal_interface_map[" << interface_name << "][" << name << "].size(): " << m_proxy_signal_interface_map[interface_name][name].size() );
+    m_proxy_signal_interface_map[interface_name][name].push_back(signal);
     this->add_match( signal->match_rule() );
     signal->set_connection(this->self());
 
@@ -743,15 +743,15 @@ namespace DBus
 
     SIMPLELOGGER_DEBUG( "dbus.Connection", "remove_signal_proxy" );
 
-    const std::string& interface = signal->interface();
+    const std::string& interface_name = signal->interface_name();
     const std::string& name = signal->name();
-    if ( interface.empty() || name.empty() ) return false;
+    if ( interface_name.empty() || name.empty() ) return false;
 
     this->remove_match( signal->match_rule() );
 
-    size_t s1 = m_proxy_signal_interface_map[interface][name].size();
-    m_proxy_signal_interface_map[interface][name].remove(signal);
-    size_t s2 = m_proxy_signal_interface_map[interface][name].size();
+    size_t s1 = m_proxy_signal_interface_map[interface_name][name].size();
+    m_proxy_signal_interface_map[interface_name][name].remove(signal);
+    size_t s2 = m_proxy_signal_interface_map[interface_name][name].size();
 
     return s2 < s1;
   }
@@ -798,16 +798,16 @@ namespace DBus
     return m_proxy_signal_interface_map;
   }
 
-  Connection::NameToProxySignalMap Connection::get_signal_proxies(const std::string & interface)
+  Connection::NameToProxySignalMap Connection::get_signal_proxies(const std::string & interface_name)
   {
-    InterfaceToNameProxySignalMap::iterator i = m_proxy_signal_interface_map.find(interface);
+    InterfaceToNameProxySignalMap::iterator i = m_proxy_signal_interface_map.find(interface_name);
     if ( i == m_proxy_signal_interface_map.end() ) return NameToProxySignalMap();
     return i->second;
   }
 
-  Connection::ProxySignals Connection::get_signal_proxies(const std::string & interface, const std::string & member)
+  Connection::ProxySignals Connection::get_signal_proxies(const std::string & interface_name, const std::string & member)
   {
-    InterfaceToNameProxySignalMap::iterator i = m_proxy_signal_interface_map.find(interface);
+    InterfaceToNameProxySignalMap::iterator i = m_proxy_signal_interface_map.find(interface_name);
     if ( i == m_proxy_signal_interface_map.end() ) return ProxySignals();
     NameToProxySignalMap::iterator j = i->second.find(member);
     if ( j == i->second.end() ) return ProxySignals();
@@ -1013,7 +1013,7 @@ namespace DBus
       SignalMessage::pointer smsg = SignalMessage::create(msg);
       HandlerResult result;
 
-      i = conn->m_proxy_signal_interface_map.find( smsg->interface() );
+      i = conn->m_proxy_signal_interface_map.find( smsg->interface_name() );
       if ( i != conn->m_proxy_signal_interface_map.end() )
       {
         j = i->second.find(smsg->member());

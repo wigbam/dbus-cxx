@@ -48,7 +48,7 @@ namespace DBus
     pthread_mutex_destroy( &m_name_mutex );
   }
 
-  InterfaceProxy* MethodProxyBase::interface() const
+  InterfaceProxy* MethodProxyBase::iface() const
   {
     return m_interface;
   }

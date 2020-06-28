@@ -22,23 +22,23 @@
 namespace DBus
 {
 
-  signal_proxy_base::signal_proxy_base( const std::string& path, const std::string& interface, const std::string& name ):
-      signal_base( path, interface, name )
+  signal_proxy_base::signal_proxy_base( const std::string& path, const std::string& interface_name, const std::string& name ):
+      signal_base( path, interface_name, name )
   {
   }
 
-  signal_proxy_base::signal_proxy_base( const std::string& interface, const std::string& name ):
-      signal_base( interface, name )
+  signal_proxy_base::signal_proxy_base( const std::string& interface_name, const std::string& name ):
+      signal_base( interface_name, name )
   {
   }
 
-  signal_proxy_base::signal_proxy_base( DBusCxxPointer<Connection>  connection, const std::string& path, const std::string& interface, const std::string& name ):
-      signal_base( connection, path, interface, name )
+  signal_proxy_base::signal_proxy_base( DBusCxxPointer<Connection>  connection, const std::string& path, const std::string& interface_name, const std::string& name ):
+      signal_base( connection, path, interface_name, name )
   {
   }
 
-  signal_proxy_base::signal_proxy_base( DBusCxxPointer<Connection>  connection, const std::string& interface, const std::string& name ):
-      signal_base( connection, interface, name )
+  signal_proxy_base::signal_proxy_base( DBusCxxPointer<Connection>  connection, const std::string& interface_name, const std::string& name ):
+      signal_base( connection, interface_name, name )
   {
   }
 
@@ -90,7 +90,7 @@ namespace DBus
 
     if ( !smsg ) smsg = SignalMessage::create( msg );
 
-    if ( m_interface != smsg->interface() ) return false;
+    if ( m_interface != smsg->interface_name() ) return false;
 
     if ( m_name != smsg->member() ) return false;
 
@@ -103,23 +103,23 @@ namespace DBus
     return true;
   }
 
-  signal_proxy_simple::signal_proxy_simple( const std::string& path, const std::string& interface, const std::string& name ):
-      signal_proxy_base( path, interface, name )
+  signal_proxy_simple::signal_proxy_simple( const std::string& path, const std::string& interface_name, const std::string& name ):
+      signal_proxy_base( path, interface_name, name )
   {
   }
 
-  signal_proxy_simple::signal_proxy_simple( const std::string& interface, const std::string& name ):
-      signal_proxy_base( interface, name )
+  signal_proxy_simple::signal_proxy_simple( const std::string& interface_name, const std::string& name ):
+      signal_proxy_base( interface_name, name )
   {
   }
 
-  signal_proxy_simple::signal_proxy_simple( DBusCxxPointer<Connection>  connection, const std::string& path, const std::string& interface, const std::string& name ):
-      signal_proxy_base( connection, path, interface, name )
+  signal_proxy_simple::signal_proxy_simple( DBusCxxPointer<Connection> connection, const std::string& path, const std::string& interface_name, const std::string& name ):
+      signal_proxy_base( connection, path, interface_name, name )
   {
   }
 
-  signal_proxy_simple::signal_proxy_simple( DBusCxxPointer<Connection>  connection, const std::string& interface, const std::string& name ):
-      signal_proxy_base( connection, interface, name )
+  signal_proxy_simple::signal_proxy_simple( DBusCxxPointer<Connection> connection, const std::string& interface_name, const std::string& name ):
+      signal_proxy_base( connection, interface_name, name )
   {
   }
 
@@ -129,24 +129,24 @@ namespace DBus
     // TODO connect to the other's connection
   }
 
-  signal_proxy_simple::pointer signal_proxy_simple::create( const std::string & path, const std::string & interface, const std::string & name )
+  signal_proxy_simple::pointer signal_proxy_simple::create( const std::string & path, const std::string & interface_name, const std::string & name )
   {
-    return pointer( new signal_proxy_simple( path, interface, name ) );
+    return pointer( new signal_proxy_simple( path, interface_name, name ) );
   }
 
-  signal_proxy_simple::pointer signal_proxy_simple::create( const std::string & interface, const std::string & name )
+  signal_proxy_simple::pointer signal_proxy_simple::create( const std::string & interface_name, const std::string & name )
   {
-    return pointer( new signal_proxy_simple( interface, name ) );
+    return pointer( new signal_proxy_simple( interface_name, name ) );
   }
 
-  signal_proxy_simple::pointer signal_proxy_simple::create( DBusCxxPointer< Connection > connection, const std::string & path, const std::string & interface, const std::string & name )
+  signal_proxy_simple::pointer signal_proxy_simple::create( DBusCxxPointer< Connection > connection, const std::string & path, const std::string & interface_name, const std::string & name )
   {
-    return pointer( new signal_proxy_simple( connection, path, interface, name ) );
+    return pointer( new signal_proxy_simple( connection, path, interface_name, name ) );
   }
 
-  signal_proxy_simple::pointer signal_proxy_simple::create( DBusCxxPointer< Connection > connection, const std::string & interface, const std::string & name )
+  signal_proxy_simple::pointer signal_proxy_simple::create( DBusCxxPointer< Connection > connection, const std::string & interface_name, const std::string & name )
   {
-    return pointer( new signal_proxy_simple( connection, interface, name ) );
+    return pointer( new signal_proxy_simple( connection, interface_name, name ) );
   }
 
   signal_proxy_simple::pointer signal_proxy_simple::create( const signal_proxy_simple & other )

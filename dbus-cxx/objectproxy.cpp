@@ -103,7 +103,7 @@ namespace DBus
     return m_interfaces;
   }
 
-  InterfaceProxy::pointer ObjectProxy::interface( const std::string & name ) const
+  InterfaceProxy::pointer ObjectProxy::iface( const std::string & name ) const
   {
     Interfaces::const_iterator iter;
 
@@ -122,31 +122,31 @@ namespace DBus
 
   InterfaceProxy::pointer ObjectProxy::operator[]( const std::string& name ) const
   {
-    return this->interface(name);
+    return this->iface(name);
   }
 
-  bool ObjectProxy::add_interface( InterfaceProxy::pointer interface )
+  bool ObjectProxy::add_interface( InterfaceProxy::pointer iface )
   {
     bool result = true;
 
-    if ( !interface ) return false;
+    if ( !iface ) return false;
 
-    if ( interface->m_object ) interface->m_object->remove_interface( interface );
+    if ( iface->m_object ) iface->m_object->remove_interface( iface );
     
     // ========== WRITE LOCK ==========
     pthread_rwlock_wrlock( &m_interfaces_rwlock );
 
     InterfaceSignalNameConnections::iterator i;
 
-    i = m_interface_signal_name_connections.find(interface);
+    i = m_interface_signal_name_connections.find(iface);
 
     if ( i == m_interface_signal_name_connections.end() )
     {
-      m_interface_signal_name_connections[interface] = interface->signal_name_changed().connect( sigc::bind(sigc::mem_fun(*this, &ObjectProxy::on_interface_name_changed), interface));
+      m_interface_signal_name_connections[iface] = iface->signal_name_changed().connect( sigc::bind(sigc::mem_fun(*this, &ObjectProxy::on_interface_name_changed), iface));
 
-      m_interfaces.insert(std::make_pair(interface->name(), interface));
+      m_interfaces.insert(std::make_pair(iface->name(), iface));
 
-      interface->m_object = this;
+      iface->m_object = this;
     }
     else
     {
@@ -156,21 +156,21 @@ namespace DBus
     // ========== UNLOCK ==========
     pthread_rwlock_unlock( &m_interfaces_rwlock );
 
-    m_signal_interface_added.emit( interface );
+    m_signal_interface_added.emit( iface );
 
     // TODO allow control over this
-    if ( !m_default_interface ) this->set_default_interface( interface->name() );
+    if ( !m_default_interface ) this->set_default_interface( iface->name() );
 
     return result;
   }
 
   InterfaceProxy::pointer ObjectProxy::create_interface(const std::string & name)
   {
-    InterfaceProxy::pointer interface;
+    InterfaceProxy::pointer iface;
 
-    interface = InterfaceProxy::create(name);
+    iface = InterfaceProxy::create(name);
 
-    if ( this->add_interface(interface) ) return interface;
+    if ( this->add_interface(iface) ) return iface;
 
     return InterfaceProxy::pointer();
   }
@@ -178,7 +178,7 @@ namespace DBus
   void ObjectProxy::remove_interface( const std::string & name )
   {
     Interfaces::iterator iter;
-    InterfaceProxy::pointer interface, old_default;
+    InterfaceProxy::pointer iface, old_default;
     InterfaceSignalNameConnections::iterator i;
     
     bool need_emit_default_changed = false;
@@ -189,20 +189,20 @@ namespace DBus
     iter = m_interfaces.find( name );
     if ( iter != m_interfaces.end() )
     {
-      interface = iter->second;
+      iface = iter->second;
       m_interfaces.erase(iter);
     }
 
-    if ( interface )
+    if ( iface )
     {
-      i = m_interface_signal_name_connections.find(interface);
+      i = m_interface_signal_name_connections.find(iface);
       if ( i != m_interface_signal_name_connections.end() )
       {
         i->second.disconnect();
         m_interface_signal_name_connections.erase(i);
       }
     
-      if ( m_default_interface == interface ) {
+      if ( m_default_interface == iface ) {
         old_default = m_default_interface;
         m_default_interface = InterfaceProxy::pointer();
         need_emit_default_changed = true;
@@ -213,12 +213,12 @@ namespace DBus
     // ========== UNLOCK ==========
     pthread_rwlock_unlock( &m_interfaces_rwlock );
 
-    if ( interface ) m_signal_interface_removed.emit( interface );
+    if ( iface ) m_signal_interface_removed.emit( iface );
 
     if ( need_emit_default_changed ) m_signal_default_interface_changed.emit( old_default, m_default_interface );
   }
 
-  void ObjectProxy::remove_interface( InterfaceProxy::pointer interface )
+  void ObjectProxy::remove_interface( InterfaceProxy::pointer iface )
   {
     Interfaces::iterator current, upper;
     InterfaceProxy::pointer old_default;
@@ -227,33 +227,33 @@ namespace DBus
     bool need_emit_default_changed = false;
     bool interface_removed = false;
 
-    if ( !interface ) return;
+    if ( !iface ) return;
 
     // ========== WRITE LOCK ==========
     pthread_rwlock_wrlock( &m_interfaces_rwlock );
 
-    current = m_interfaces.lower_bound( interface->name() );
-    upper = m_interfaces.upper_bound( interface->name() );
+    current = m_interfaces.lower_bound( iface->name() );
+    upper = m_interfaces.upper_bound( iface->name() );
 
     for ( ; current != upper; current++ )
     {
-      if ( current->second == interface )
+      if ( current->second == iface )
       {
-        i = m_interface_signal_name_connections.find(interface);
+        i = m_interface_signal_name_connections.find(iface);
         if ( i != m_interface_signal_name_connections.end() )
         {
           i->second.disconnect();
           m_interface_signal_name_connections.erase(i);
         }
     
-        if ( m_default_interface == interface )
+        if ( m_default_interface == iface )
         {
           old_default = m_default_interface;
           m_default_interface = InterfaceProxy::pointer();
           need_emit_default_changed = true;
         }
 
-        interface->m_object = NULL;
+        iface->m_object = NULL;
         m_interfaces.erase(current);
 
         interface_removed = true;
@@ -265,7 +265,7 @@ namespace DBus
     // ========== UNLOCK ==========
     pthread_rwlock_unlock( &m_interfaces_rwlock );
 
-    if ( interface_removed ) m_signal_interface_removed.emit( interface );
+    if ( interface_removed ) m_signal_interface_removed.emit( iface );
 
     if ( need_emit_default_changed ) m_signal_default_interface_changed.emit( old_default, m_default_interface );
   }
@@ -285,9 +285,9 @@ namespace DBus
     return ( i != m_interfaces.end() );
   }
 
-  bool ObjectProxy::has_interface( InterfaceProxy::pointer interface ) const
+  bool ObjectProxy::has_interface( InterfaceProxy::pointer iface ) const
   {
-    if ( !interface ) return false;
+    if ( !iface ) return false;
     
     Interfaces::const_iterator current, upper;
     bool result = false;
@@ -295,14 +295,14 @@ namespace DBus
     // ========== READ LOCK ==========
     pthread_rwlock_rdlock( &m_interfaces_rwlock );
 
-    current = m_interfaces.lower_bound(interface->name());
+    current = m_interfaces.lower_bound(iface->name());
 
     if ( current != m_interfaces.end() )
     {
-      upper = m_interfaces.upper_bound(interface->name());
+      upper = m_interfaces.upper_bound(iface->name());
       for ( ; current != upper; current++)
       {
-        if ( current->second == interface )
+        if ( current->second == iface )
         {
           result = true;
           break;
@@ -347,17 +347,17 @@ namespace DBus
     return result;
   }
 
-  bool ObjectProxy::set_default_interface( InterfaceProxy::pointer interface )
+  bool ObjectProxy::set_default_interface( InterfaceProxy::pointer iface )
   {
     Interfaces::iterator iter;
     InterfaceProxy::pointer old_default;
 
-    if ( !interface ) return false;
+    if ( !iface ) return false;
 
-    if ( !this->has_interface(interface) ) this->add_interface(interface);
+    if ( !this->has_interface(iface) ) this->add_interface(iface);
 
     old_default = m_default_interface;
-    m_default_interface = interface;
+    m_default_interface = iface;
 
     m_signal_default_interface_changed.emit( old_default, m_default_interface );
 
@@ -377,7 +377,7 @@ namespace DBus
   {
     if ( !method ) return false;
     
-    InterfaceProxy::pointer iface = this->interface(ifacename);
+    InterfaceProxy::pointer iface = this->iface(ifacename);
 
     if ( !iface ) iface = this->create_interface(ifacename);
 
@@ -392,7 +392,7 @@ namespace DBus
     
     if ( !iface )
     {
-      iface = this->interface("");
+      iface = this->iface("");
       if ( !iface ) iface = this->create_interface("");
       if ( !m_default_interface ) this->set_default_interface(iface);
     }
@@ -467,7 +467,7 @@ namespace DBus
     return m_signal_default_interface_changed;
   }
 
-  void ObjectProxy::on_interface_name_changed(const std::string & oldname, const std::string & newname, InterfaceProxy::pointer interface)
+  void ObjectProxy::on_interface_name_changed(const std::string & oldname, const std::string & newname, InterfaceProxy::pointer iface)
   {
   
     // ========== WRITE LOCK ==========
@@ -482,7 +482,7 @@ namespace DBus
 
       for ( ; current != upper; current++ )
       {
-        if ( current->second == interface )
+        if ( current->second == iface )
         {
           m_interfaces.erase(current);
           break;
@@ -490,14 +490,14 @@ namespace DBus
       }
     }
 
-    m_interfaces.insert( std::make_pair(newname, interface) );
+    m_interfaces.insert( std::make_pair(newname, iface) );
 
     InterfaceSignalNameConnections::iterator i;
-    i = m_interface_signal_name_connections.find(interface);
+    i = m_interface_signal_name_connections.find(iface);
     if ( i == m_interface_signal_name_connections.end() )
     {
-      m_interface_signal_name_connections[interface] =
-          interface->signal_name_changed().connect(sigc::bind(sigc::mem_fun(*this,&ObjectProxy::on_interface_name_changed),interface));
+      m_interface_signal_name_connections[iface] =
+          iface->signal_name_changed().connect(sigc::bind(sigc::mem_fun(*this,&ObjectProxy::on_interface_name_changed),iface));
     }
     
     // ========== UNLOCK ==========

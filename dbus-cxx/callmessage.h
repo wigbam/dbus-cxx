@@ -84,7 +84,7 @@ namespace DBus
 
       bool set_interface( const std::string& i );
 
-      const char* interface() const;
+      const char* interface_name() const;
 
       bool has_interface( const std::string& i ) const;
 

@@ -213,16 +213,16 @@ namespace DBus
     return dbus_message_get_sender( m_cobj );
   }
 
-  bool Message::is_call( const std::string& interface, const std::string& method ) const
+  bool Message::is_call( const std::string& interface_name, const std::string& method ) const
   {
     if ( m_cobj == NULL ) return false;
-    return dbus_message_is_method_call( m_cobj, interface.c_str(), method.c_str() );
+    return dbus_message_is_method_call( m_cobj, interface_name.c_str(), method.c_str() );
   }
 
-  bool Message::is_signal( const std::string& interface, const std::string& signal_name ) const
+  bool Message::is_signal( const std::string& interface_name, const std::string& signal_name ) const
   {
     if ( m_cobj == NULL ) return false;
-    return dbus_message_is_signal( m_cobj, interface.c_str(), signal_name.c_str() );
+    return dbus_message_is_signal( m_cobj, interface_name.c_str(), signal_name.c_str() );
   }
 
   bool Message::is_error( const std::string& error_name ) const

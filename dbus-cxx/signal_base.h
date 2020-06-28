@@ -49,13 +49,13 @@ namespace DBus
   {
     protected:
       
-      signal_base(const std::string& path, const std::string& interface, const std::string& name);
+      signal_base(const std::string& path, const std::string& interface_name, const std::string& name);
 
-      signal_base(const std::string& interface, const std::string& name);
+      signal_base(const std::string& interface_name, const std::string& name);
 
-      signal_base(DBusCxxPointer<Connection> connection, const std::string& path, const std::string& interface, const std::string& name);
+      signal_base(DBusCxxPointer<Connection> connection, const std::string& path, const std::string& interface_name, const std::string& name);
 
-      signal_base(DBusCxxPointer<Connection> connection, const std::string& interface, const std::string& name);
+      signal_base(DBusCxxPointer<Connection> connection, const std::string& interface_name, const std::string& name);
 
       signal_base(const signal_base& other);
 
@@ -73,7 +73,7 @@ namespace DBus
 
       void set_sender(const std::string& s);
 
-      const std::string& interface() const;
+      const std::string& interface_name() const;
 
       void set_interface(const std::string& i);
 

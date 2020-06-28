@@ -75,13 +75,13 @@ define([DEFINE_CREATE_INTERFACE_METHOD],[dnl
   DBusCxxPointer<Method<LIST(T_return, LOOP(T_arg%1, $1))> >
   Object::create_method( const std::string& interface_name, const std::string& method_name, sigc::slot$1<LIST(T_return, LOOP(T_arg%1, $1))> slot )
   {
-    Interface::pointer interface;
-    interface = this->interface(interface_name);
-    if ( !interface ) interface = this->create_interface(interface_name);
+    Interface::pointer iface;
+    iface = this->iface(interface_name);
+    if ( !iface ) iface = this->create_interface(interface_name);
     // TODO throw an error if the interface still doesn't exist
 
     DBusCxxPointer< Method<LIST(T_return, LOOP(T_arg%1, $1))> > method;
-    method = interface->create_method<LIST(T_return, LOOP(T_arg%1, $1))>(method_name);
+    method = iface->create_method<LIST(T_return, LOOP(T_arg%1, $1))>(method_name);
     method->set_method( slot );
     return method;
   }
@@ -134,7 +134,7 @@ define([DEFINE_CREATE_SIGNAL_IN],[dnl
   {
     DBusCxxPointer<DBus::signal<LIST(T_return, LOOP(T_arg%1, $1))> > sig;
     if ( !has_interface(iface) ) this->create_interface(iface);
-    sig = this->interface(iface)->create_signal<LIST(T_return, LOOP(T_arg%1, $1))>(name);
+    sig = this->iface(iface)->create_signal<LIST(T_return, LOOP(T_arg%1, $1))>(name);
     return sig;
   }
 ])
@@ -291,10 +291,10 @@ namespace DBus
       const Interfaces& interfaces() const;
 
       /** Returns the first interface with the given name */
-      DBusCxxPointer<Interface> interface( const std::string& name ) const;
+      DBusCxxPointer<Interface> iface( const std::string& name ) const;
 
       /** Adds the interface to this object */
-      bool add_interface( DBusCxxPointer<Interface> interface );
+      bool add_interface( DBusCxxPointer<Interface> iface );
 
       /**
        * Creates and adds the named interface to this object
@@ -455,8 +455,7 @@ FOR(0, eval(CALL_SIZE),[[DECLARE_CREATE_SIGNAL_IN(%1)
        * Callback point that updates the interface name map when an interface
        * changes its name.
        */
-      void on_interface_name_changed(const std::string& oldname, const std::string& newname, DBusCxxPointer<Interface>  interface);
-
+      void on_interface_name_changed(const std::string& oldname, const std::string& newname, DBusCxxPointer<Interface> iface);
   };
 
 }

@@ -65,7 +65,7 @@ namespace DBus
     return m_interfaces;
   }
 
-  Interface::pointer Object::interface( const std::string & name ) const
+  Interface::pointer Object::iface( const std::string & name ) const
   {
     Interfaces::const_iterator iter;
 
@@ -82,28 +82,28 @@ namespace DBus
     return iter->second;
   }
 
-  bool Object::add_interface( Interface::pointer interface )
+  bool Object::add_interface( Interface::pointer iface )
   {
     bool result = true;
 
-    if ( !interface ) return false;
+    if ( !iface ) return false;
     
-    SIMPLELOGGER_DEBUG("dbus.Object","Object::add_interface " << interface->name() );
+    SIMPLELOGGER_DEBUG("dbus.Object","Object::add_interface " << iface->name() );
 
     // ========== WRITE LOCK ==========
     pthread_rwlock_wrlock( &m_interfaces_rwlock );
 
     InterfaceSignalNameConnections::iterator i;
 
-    i = m_interface_signal_name_connections.find(interface);
+    i = m_interface_signal_name_connections.find(iface);
 
     if ( i == m_interface_signal_name_connections.end() )
     {
-      m_interface_signal_name_connections[interface] = interface->signal_name_changed().connect( sigc::bind(sigc::mem_fun(*this, &Object::on_interface_name_changed), interface));
+      m_interface_signal_name_connections[iface] = iface->signal_name_changed().connect( sigc::bind(sigc::mem_fun(*this, &Object::on_interface_name_changed), iface));
 
-      m_interfaces.insert(std::make_pair(interface->name(), interface));
+      m_interfaces.insert(std::make_pair(iface->name(), iface));
 
-      interface->set_object(this);
+      iface->set_object(this);
     }
     else
     {
@@ -113,23 +113,23 @@ namespace DBus
     // ========== UNLOCK ==========
     pthread_rwlock_unlock( &m_interfaces_rwlock );
 
-    m_signal_interface_added.emit( interface );
+    m_signal_interface_added.emit( iface );
 
     // TODO allow control over this
-    if ( !m_default_interface ) this->set_default_interface( interface->name() );
+    if ( !m_default_interface ) this->set_default_interface( iface->name() );
 
-    SIMPLELOGGER_DEBUG("dbus.Object","Object::add_interface " << interface->name() << " successful: " << result);
+    SIMPLELOGGER_DEBUG("dbus.Object","Object::add_interface " << iface->name() << " successful: " << result);
 
     return result;
   }
 
   Interface::pointer Object::create_interface(const std::string & name)
   {
-    Interface::pointer interface;
+    Interface::pointer iface;
 
-    interface = Interface::create(name);
+    iface = Interface::create(name);
 
-    if ( this->add_interface(interface) ) return interface;
+    if ( this->add_interface(iface) ) return iface;
 
     return Interface::pointer();
   }
@@ -137,7 +137,7 @@ namespace DBus
   void Object::remove_interface( const std::string & name )
   {
     Interfaces::iterator iter;
-    Interface::pointer interface, old_default;
+    Interface::pointer iface, old_default;
     InterfaceSignalNameConnections::iterator i;
     
     bool need_emit_default_changed = false;
@@ -148,21 +148,21 @@ namespace DBus
     iter = m_interfaces.find( name );
     if ( iter != m_interfaces.end() )
     {
-      interface = iter->second;
+      iface = iter->second;
       m_interfaces.erase(iter);
     }
 
-    if ( interface )
+    if ( iface )
     {
-      i = m_interface_signal_name_connections.find(interface);
+      i = m_interface_signal_name_connections.find(iface);
       if ( i != m_interface_signal_name_connections.end() )
       {
         i->second.disconnect();
         m_interface_signal_name_connections.erase(i);
-        interface->set_object(NULL);
+        iface->set_object(NULL);
       }
     
-      if ( m_default_interface == interface ) {
+      if ( m_default_interface == iface ) {
         old_default = m_default_interface;
         m_default_interface = Interface::pointer();
         need_emit_default_changed = true;
@@ -173,7 +173,7 @@ namespace DBus
     // ========== UNLOCK ==========
     pthread_rwlock_unlock( &m_interfaces_rwlock );
 
-    if ( interface ) m_signal_interface_removed.emit( interface );
+    if ( iface ) m_signal_interface_removed.emit( iface );
 
     if ( need_emit_default_changed ) m_signal_default_interface_changed.emit( old_default, m_default_interface );
   }
@@ -306,7 +306,7 @@ namespace DBus
   HandlerResult Object::handle_message( Connection::pointer connection , Message::const_pointer message )
   {
     Interfaces::iterator current, upper;
-    Interface::pointer interface;
+    Interface::pointer iface;
     HandlerResult result = NOT_HANDLED;
 
     SIMPLELOGGER_DEBUG("dbus.Object","Object::handle_message: before call message test");
@@ -320,15 +320,15 @@ namespace DBus
 
     if ( !callmessage ) return NOT_HANDLED;
 
-    SIMPLELOGGER_DEBUG("dbus.Object","Object::handle_message: message is good (it's a call message) for interface '" << callmessage->interface() << "'");
+    SIMPLELOGGER_DEBUG("dbus.Object","Object::handle_message: message is good (it's a call message) for interface '" << callmessage->interface_name() << "'");
 
-    if ( callmessage->interface() == NULL ){
+    if ( callmessage->interface_name() == NULL ){
         //If for some reason the message that we are getting has a NULL interface, we will segfault.
         return NOT_HANDLED;
     }
 
     // Handle the introspection interface
-    if ( strcmp(callmessage->interface(), DBUS_CXX_INTROSPECTABLE_INTERFACE) == 0 )
+    if ( strcmp(callmessage->interface_name(), DBUS_CXX_INTROSPECTABLE_INTERFACE) == 0 )
     {
       SIMPLELOGGER_DEBUG("dbus.Object","Object::handle_message: introspection interface called");
       ReturnMessage::pointer return_message = callmessage->create_reply();
@@ -342,7 +342,7 @@ namespace DBus
     // ========== READ LOCK ==========
     pthread_rwlock_rdlock( &m_interfaces_rwlock );
 
-    current = m_interfaces.lower_bound( callmessage->interface() );
+    current = m_interfaces.lower_bound( callmessage->interface_name() );
 
     // Do we have an interface or do we need to use the default???
     if ( current == m_interfaces.end() )
@@ -355,7 +355,7 @@ namespace DBus
     else
     {
       // Set up the upper limit of interfaces
-      upper = m_interfaces.upper_bound( callmessage->interface() );
+      upper = m_interfaces.upper_bound( callmessage->interface_name() );
 
 
     SIMPLELOGGER_DEBUG("dbus.Object","Object::handle_message: before handling lower bound interface is " << current->second->name() );
@@ -385,7 +385,7 @@ namespace DBus
     return result;
   }
 
-  void Object::on_interface_name_changed(const std::string & oldname, const std::string & newname, Interface::pointer interface)
+  void Object::on_interface_name_changed(const std::string & oldname, const std::string & newname, Interface::pointer iface)
   {
   
     // ========== WRITE LOCK ==========
@@ -400,7 +400,7 @@ namespace DBus
 
       for ( ; current != upper; current++ )
       {
-        if ( current->second == interface )
+        if ( current->second == iface )
         {
           m_interfaces.erase(current);
           break;
@@ -408,14 +408,14 @@ namespace DBus
       }
     }
 
-    m_interfaces.insert( std::make_pair(newname, interface) );
+    m_interfaces.insert( std::make_pair(newname, iface) );
 
     InterfaceSignalNameConnections::iterator i;
-    i = m_interface_signal_name_connections.find(interface);
+    i = m_interface_signal_name_connections.find(iface);
     if ( i == m_interface_signal_name_connections.end() )
     {
-      m_interface_signal_name_connections[interface] =
-          interface->signal_name_changed().connect(sigc::bind(sigc::mem_fun(*this,&Object::on_interface_name_changed),interface));
+      m_interface_signal_name_connections[iface] =
+          iface->signal_name_changed().connect(sigc::bind(sigc::mem_fun(*this,&Object::on_interface_name_changed),iface));
     }
     
     // ========== UNLOCK ==========
