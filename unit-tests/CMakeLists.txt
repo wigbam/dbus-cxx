@@ -1,6 +1,9 @@
 
-set( TEST_INCLUDES ${dbus_INCLUDE_DIRS} ${sigc_INCLUDE_DIRS} ${cppgenerate_INCLUDE_DIRS} )
-set( TEST_LINK dbus-cxx ${dbus_LDFLAGS} ${sigc_LDFLAGS} ${popt_LDFLAGS} ${expat_LDFLAGS} -lrt )
+set( TEST_LIBRARIES dbus-cxx ${dbus_LIBRARIES} ${sigc_LIBRARIES} )
+find_library( LIBRT rt )
+if( LIBRT )
+	set( TEST_LIBRARIES ${TEST_LIBRARIES} ${LIBRT} )
+endif( LIBRT )
 
 link_directories( ${CMAKE_BINARY_DIR} )
 
@@ -10,7 +13,7 @@ include_directories( ${CMAKE_SOURCE_DIR}/dbus-cxx
     ${sigc_INCLUDE_DIRS} )
 
 add_executable( test-callmessage callmessagetests.cpp )
-target_link_libraries( test-callmessage ${TEST_LINK} )
+target_link_libraries( test-callmessage ${TEST_LIBRARIES} )
 target_include_directories( test-callmessage PUBLIC ${CMAKE_SOURCE_DIR} )
 target_include_directories( test-callmessage PUBLIC ${CMAKE_CURRENT_BINARY_DIR} )
 
@@ -29,7 +32,7 @@ add_test( NAME Callmessage-array_double COMMAND test-callmessage array_double)
 add_test( NAME Callmessage-multiple COMMAND test-callmessage multiple)
 
 add_executable( test-messageiterator messageiteratortests.cpp )
-target_link_libraries( test-messageiterator ${TEST_LINK} )
+target_link_libraries( test-messageiterator ${TEST_LIBRARIES} )
 target_include_directories( test-messageiterator PUBLIC ${CMAKE_SOURCE_DIR} )
 target_include_directories( test-messageiterator PUBLIC ${CMAKE_CURRENT_BINARY_DIR} )
 
@@ -79,7 +82,7 @@ add_test( NAME messageiterator-filedescriptor-2 COMMAND test-messageiterator fil
 add_test( NAME messageiterator-multiple-2 COMMAND test-messageiterator multiple-2)
 
 add_executable( test-path pathclasstests.cpp )
-target_link_libraries( test-path ${TEST_LINK} )
+target_link_libraries( test-path ${TEST_LIBRARIES} )
 target_include_directories( test-path PUBLIC ${CMAKE_SOURCE_DIR} )
 target_include_directories( test-path PUBLIC ${CMAKE_CURRENT_BINARY_DIR} )
 
@@ -103,7 +106,7 @@ add_test( NAME path-append-invalid-double_slash COMMAND test-path append_invalid
 add_test( NAME path-append-invalid-root COMMAND test-path append_invalid_root)
 
 add_executable( test-connection connectiontests.cpp )
-target_link_libraries( test-connection ${TEST_LINK} )
+target_link_libraries( test-connection ${TEST_LIBRARIES} )
 target_include_directories( test-connection PUBLIC ${CMAKE_SOURCE_DIR} )
 target_include_directories( test-connection PUBLIC ${CMAKE_CURRENT_BINARY_DIR} )
 
@@ -116,7 +119,7 @@ add_test( NAME connection-proxy-get-iface-name COMMAND dbus-wrapper.sh test-conn
 # Object Tests
 #
 add_executable( object-tests objecttests.cpp )
-target_link_libraries( object-tests ${TEST_LINK} )
+target_link_libraries( object-tests ${TEST_LIBRARIES} )
 target_include_directories( object-tests PUBLIC ${CMAKE_SOURCE_DIR} )
 target_include_directories( object-tests PUBLIC ${CMAKE_CURRENT_BINARY_DIR} )
 
@@ -129,7 +132,7 @@ add_test( NAME export-method COMMAND dbus-wrapper.sh object-tests export_method)
 #
 configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/dbus-wrapper-data-tests.sh ${CMAKE_CURRENT_BINARY_DIR}/dbus-wrapper-data-tests.sh COPYONLY)
 add_executable( data-tests datatests.cpp )
-target_link_libraries( data-tests ${TEST_LINK} )
+target_link_libraries( data-tests ${TEST_LIBRARIES} )
 target_include_directories( data-tests PUBLIC ${CMAKE_SOURCE_DIR} )
 target_include_directories( data-tests PUBLIC ${CMAKE_CURRENT_BINARY_DIR} )
 
@@ -139,7 +142,7 @@ add_test( NAME call-void-method COMMAND dbus-wrapper-data-tests.sh void_method)
 #
 # Signal tests - make sure we can tx and rx singals correctly
 add_executable( signal-tests signaltests.cpp )
-target_link_libraries( signal-tests ${TEST_LINK} )
+target_link_libraries( signal-tests ${TEST_LIBRARIES} )
 target_include_directories( signal-tests PUBLIC ${CMAKE_SOURCE_DIR} )
 target_include_directories( signal-tests PUBLIC ${CMAKE_CURRENT_BINARY_DIR} )
 
