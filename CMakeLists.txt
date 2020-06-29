@@ -25,6 +25,7 @@ option( ENABLE_TOOLS "Enable dbus-cxx tools" OFF )
 option( ENABLE_GLIBMM "Enable GLibMM support" OFF )
 option( BUILD_SITE "Build the dbus-cxx website reference" OFF )
 option( TOOLS_BUNDLED_CPPGENERATE "Use bundled libcppgenerate" ON )
+option( BUILD_STATIC_LIBRARIES "Build static library" OFF )
 option( ENABLE_CODE_COVERAGE_REPORT "Enable code coverage report" OFF )
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake-modules")
@@ -152,22 +153,31 @@ include_directories( ${DBUS_CXX_INCLUDE_DIRECTORIES}
 # Target for the library
 #
 add_library( dbus-cxx SHARED ${DBUS_CXX_SOURCES} )
-#add_library( dbus-cxx-static STATIC ${DBUS_CXX_SOURCES} )
 set_target_properties( dbus-cxx PROPERTIES VERSION 1.0.0 SOVERSION 1 )
-set( DBUS_CXX_LIBRARIES ${dbus_LIBRARIES} ${sigc_LIBRARIES} )
+set( DBUS_CXX_EXTRA_LIBS )
 
 find_library( LIBRT rt )
 if( LIBRT )
-	set( DBUS_CXX_LIBRARIES ${DBUS_CXX_LIBRARIES} ${LIBRT} )
+	set( DBUS_CXX_EXTRA_LIBS ${DBUS_CXX_EXTRA_LIBS} ${LIBRT} )
 endif( LIBRT )
 
 set( THREADS_PREFER_PTHREAD_FLAG ON )
 find_package( Threads )
 if( Threads_FOUND )
-	set( DBUS_CXX_LIBRARIES ${DBUS_CXX_LIBRARIES} Threads::Threads )
+	set( DBUS_CXX_EXTRA_LIBS ${DBUS_CXX_EXTRA_LIBS} Threads::Threads )
 endif( Threads_FOUND )
 
-target_link_libraries( dbus-cxx ${DBUS_CXX_LIBRARIES} )
+target_link_libraries( dbus-cxx ${dbus_LIBRARIES} ${sigc_LIBRARIES} ${DBUS_CXX_EXTRA_LIBS} )
+
+if( BUILD_STATIC_LIBRARIES )
+	add_library( dbus-cxx-static STATIC ${DBUS_CXX_SOURCES} )
+    set_target_properties( dbus-cxx-static PROPERTIES OUTPUT_NAME "dbus-cxx" )
+	target_link_libraries( dbus-cxx-static
+	    ${dbus_STATIC_LIBRARIES}
+	    ${sigc_STATIC_LIBRARIES}
+	    ${DBUS_CXX_EXTRA_LIBS}
+	)
+endif( BUILD_STATIC_LIBRARIES )
 
 #
 # If GLIBMM is used, add in the appropriate packages
@@ -175,12 +185,25 @@ target_link_libraries( dbus-cxx ${DBUS_CXX_LIBRARIES} )
 if( ENABLE_GLIBMM )
     pkg_check_modules( glibmm-2.4 REQUIRED glibmm-2.4 )
 
-    add_library( dbus-cxx-glibmm SHARED dbus-cxx-glibmm/dispatcher.cpp )
-    set_target_properties( dbus-cxx-glibmm PROPERTIES VERSION 1.0.0 SOVERSION 1 )
-    target_include_directories( dbus-cxx-glibmm PRIVATE ${glibmm-2.4_INCLUDE_DIRS} )
-    add_dependencies( dbus-cxx-glibmm dbus-cxx )
+    function( build_glibmm_library TARGET_NAME TARGET_TYPE DEP_TARGET_NAME PROP_PREFIX )
+        link_directories( ${glibmm-2.4_${PROP_PREFIX}LIBRARY_DIRS} )
+        add_library( ${TARGET_NAME} ${TARGET_TYPE} dbus-cxx-glibmm/dispatcher.cpp )
+        add_dependencies( ${TARGET_NAME} ${DEP_TARGET_NAME} )
+        target_link_libraries( ${TARGET_NAME} ${DEP_TARGET_NAME} ${glibmm-2.4_${PROP_PREFIX}LIBRARIES} )
+        target_include_directories( ${TARGET_NAME} PRIVATE
+            ${glibmm-2.4_${PROP_PREFIX}INCLUDE_DIRS}
+            ${glibmm-2.4_${PROP_PREFIX}INCLUDEDIR}
+        )
+        set( install_targets ${install_targets} ${TARGET_NAME} PARENT_SCOPE )
+    endfunction( build_glibmm_library )
 
-    set( install_targets ${install_targets} dbus-cxx-glibmm )
+    build_glibmm_library( dubs-cxx-glibmm SHARED dbus-cxx "" )
+    set_target_properties( dubs-cxx-glibmm PROPERTIES VERSION 1.0.0 SOVERSION 1 )
+	if( BUILD_STATIC_LIBRARIES )
+        build_glibmm_library( dbus-cxx-glibmm-static STATIC dbus-cxx-static "STATIC_" )
+        set_target_properties( dbus-cxx-glibmm-static PROPERTIES OUTPUT_NAME "dbus-cxx-glibmm" )
+    endif( BUILD_STATIC_LIBRARIES )
+
     install( FILES dbus-cxx-glibmm.h DESTINATION include/dbus-cxx-${DBUS_CXX_MAJMIN_VERSION} )
     install( FILES dbus-cxx-glibmm/dispatcher.h DESTINATION include/dbus-cxx-${DBUS_CXX_MAJMIN_VERSION}/dbus-cxx-glibmm/ )
 endif( ENABLE_GLIBMM )
@@ -226,12 +249,19 @@ foreach( filename
 
     # we need to add a dependency to the library to ensure that the files get regenerated
     add_dependencies( dbus-cxx generate-${sanitized_file} )
+	if( BUILD_STATIC_LIBRARIES )
+		add_dependencies( dbus-cxx-static generate-${sanitized_file} )
+	endif( BUILD_STATIC_LIBRARIES )
 endforeach( filename )
 
 #
 # Library install information
 #
 set( install_targets ${install_targets} dbus-cxx )
+if( BUILD_STATIC_LIBRARIES )
+	set( install_targets ${install_targets} dbus-cxx-static )
+endif( BUILD_STATIC_LIBRARIES )
+
 install( TARGETS ${install_targets}
     LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
     ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}" )
@@ -259,6 +289,11 @@ SET(PKG_CONFIG_CFLAGS
 SET(PKG_CONFIG_REQUIRES
     "dbus-1 >= 1.3, sigc++-2.0"
 )
+if ( BUILD_STATIC_LIBRARIES )
+    if( CMAKE_THREAD_LIBS_INIT )
+        SET( PKG_CONFIG_LIBS_PRIVATE ${CMAKE_THREAD_LIBS_INIT} )
+    endif( CMAKE_THREAD_LIBS_INIT )
+endif( BUILD_STATIC_LIBRARIES )
 
 CONFIGURE_FILE(
     "${CMAKE_CURRENT_SOURCE_DIR}/dbus-cxx-1.0.pc.cmake.in"
@@ -359,6 +394,7 @@ message(STATUS "  C++ compiler .................... : ${CMAKE_CXX_COMPILER}")
 message(STATUS "  Build examples .................. : ${ENABLE_EXAMPLES}")
 message(STATUS "  Build tests ..................... : ${ENABLE_TESTS}")
 message(STATUS "  Build tools ..................... : ${ENABLE_TOOLS}")
+message(STATUS "  Build static libraries........... : ${BUILD_STATIC_LIBRARIES}")
 message(STATUS "  Use bundled cppgenerate ......... : ${TOOLS_BUNDLED_CPPGENERATE}")
 message(STATUS "  Enable GLibmm support ........... : ${ENABLE_GLIBMM}")
 message(STATUS "  Build website ................... : ${BUILD_SITE}")
