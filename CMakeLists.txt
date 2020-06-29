@@ -58,7 +58,7 @@ set( CMAKE_CXX_STANDARD_REQUIRED ON )
 #
 set( DBUS_CXX_HAVE_DBUS_12 1 )
 CHECK_TYPE_SIZE( "long int" DBUS_CXX_SIZEOF_LONG_INT )
-configure_file( dbus-cxx-config.h.cmake dbus-cxx/dbus-cxx-config.h )
+configure_file( dbus-cxx-config.h.cmake.in dbus-cxx/dbus-cxx-config.h )
 
 # 
 # All sources
@@ -252,7 +252,7 @@ SET(PKG_CONFIG_REQUIRES
 )
 
 CONFIGURE_FILE(
-    "${CMAKE_CURRENT_SOURCE_DIR}/dbus-cxx-1.0.pc.cmake"
+    "${CMAKE_CURRENT_SOURCE_DIR}/dbus-cxx-1.0.pc.cmake.in"
     "${CMAKE_CURRENT_BINARY_DIR}/dbus-cxx-1.0.pc"
 )
 INSTALL( FILES "${CMAKE_BINARY_DIR}/dbus-cxx-1.0.pc"
@@ -260,7 +260,7 @@ INSTALL( FILES "${CMAKE_BINARY_DIR}/dbus-cxx-1.0.pc"
 
 if( ENABLE_GLIBMM )
     CONFIGURE_FILE(
-        "${CMAKE_CURRENT_SOURCE_DIR}/dbus-cxx-glibmm-1.0.pc.cmake"
+        "${CMAKE_CURRENT_SOURCE_DIR}/dbus-cxx-glibmm-1.0.pc.cmake.in"
         "${CMAKE_CURRENT_BINARY_DIR}/dbus-cxx-glibmm-1.0.pc"
     )
     INSTALL( FILES "${CMAKE_BINARY_DIR}/dbus-cxx-glibmm-1.0.pc"
