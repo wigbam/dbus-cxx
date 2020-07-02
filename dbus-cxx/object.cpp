@@ -16,9 +16,11 @@
  *   You should have received a copy of the GNU General Public License     *
  *   along with this software. If not see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
-#include "utility.h"
 #include "object.h"
+
 #include "dbus-cxx-private.h"
+#include "locks.h"
+#include "utility.h"
 
 #include <map>
 #include <sstream>
@@ -27,23 +29,32 @@
 
 namespace DBus
 {
+  class Object::priv_data {
+  public:
+      priv_data() {
+          DBUS_CXX_SHARED_LOCK_INIT( m_interfaces_rwlock );
+      }
+
+      ~priv_data() {
+          DBUS_CXX_SHARED_LOCK_DESTROY( m_interfaces_rwlock );
+      }
+
+      mutable DBUS_CXX_SHARED_LOCK_TYPE m_interfaces_rwlock;
+  };
 
   Object::Object( const std::string& path, PrimaryFallback pf ):
       ObjectPathHandler( path, pf )
   {
-    pthread_mutex_init( &m_name_mutex, NULL );
-    pthread_rwlock_init( &m_interfaces_rwlock, NULL );
+    m_priv = std::make_unique<priv_data>();
+  }
+
+  Object::~ Object( )
+  {
   }
 
   Object::pointer Object::create( const std::string& path, PrimaryFallback pf )
   {
     return pointer( new Object( path, pf ) );
-  }
-
-  Object::~ Object( )
-  {
-    pthread_mutex_destroy( &m_name_mutex );
-    pthread_rwlock_destroy( &m_interfaces_rwlock );
   }
 
   bool Object::register_with_connection(Connection::pointer conn)
@@ -70,12 +81,12 @@ namespace DBus
     Interfaces::const_iterator iter;
 
     // ========== READ LOCK ==========
-    pthread_rwlock_rdlock( &m_interfaces_rwlock );
+    DBUS_CXX_LOCK_SHARED( m_priv->m_interfaces_rwlock );
 
     iter = m_interfaces.find( name );
 
     // ========== UNLOCK ==========
-    pthread_rwlock_unlock( &m_interfaces_rwlock );
+    DBUS_CXX_UNLOCK_SHARED( m_priv->m_interfaces_rwlock );
 
     if ( iter == m_interfaces.end() ) return Interface::pointer();
 
@@ -91,7 +102,7 @@ namespace DBus
     SIMPLELOGGER_DEBUG("dbus.Object","Object::add_interface " << iface->name() );
 
     // ========== WRITE LOCK ==========
-    pthread_rwlock_wrlock( &m_interfaces_rwlock );
+    DBUS_CXX_LOCK_EXCLUSIVE( m_priv->m_interfaces_rwlock );
 
     InterfaceSignalNameConnections::iterator i;
 
@@ -111,7 +122,7 @@ namespace DBus
     }
 
     // ========== UNLOCK ==========
-    pthread_rwlock_unlock( &m_interfaces_rwlock );
+    DBUS_CXX_UNLOCK_EXCLUSIVE( m_priv->m_interfaces_rwlock );
 
     m_signal_interface_added.emit( iface );
 
@@ -143,7 +154,7 @@ namespace DBus
     bool need_emit_default_changed = false;
 
     // ========== WRITE LOCK ==========
-    pthread_rwlock_wrlock( &m_interfaces_rwlock );
+    DBUS_CXX_LOCK_EXCLUSIVE( m_priv->m_interfaces_rwlock );
     
     iter = m_interfaces.find( name );
     if ( iter != m_interfaces.end() )
@@ -171,7 +182,7 @@ namespace DBus
     }
 
     // ========== UNLOCK ==========
-    pthread_rwlock_unlock( &m_interfaces_rwlock );
+    DBUS_CXX_UNLOCK_EXCLUSIVE( m_priv->m_interfaces_rwlock );
 
     if ( iface ) m_signal_interface_removed.emit( iface );
 
@@ -183,12 +194,12 @@ namespace DBus
     Interfaces::const_iterator i;
     
     // ========== READ LOCK ==========
-    pthread_rwlock_rdlock( &m_interfaces_rwlock );
+    DBUS_CXX_LOCK_SHARED( m_priv->m_interfaces_rwlock );
 
     i = m_interfaces.find( name );
 
     // ========== UNLOCK ==========
-    pthread_rwlock_unlock( &m_interfaces_rwlock );
+    DBUS_CXX_UNLOCK_SHARED( m_priv->m_interfaces_rwlock );
 
     return ( i != m_interfaces.end() );
   }
@@ -205,7 +216,7 @@ namespace DBus
     bool result = false;
 
     // ========== READ LOCK ==========
-    pthread_rwlock_rdlock( &m_interfaces_rwlock );
+    DBUS_CXX_LOCK_SHARED( m_priv->m_interfaces_rwlock );
 
     iter = m_interfaces.find( new_default_name );
 
@@ -217,7 +228,7 @@ namespace DBus
     }
     
     // ========== UNLOCK ==========
-    pthread_rwlock_unlock( &m_interfaces_rwlock );
+    DBUS_CXX_UNLOCK_SHARED( m_priv->m_interfaces_rwlock );
 
     if ( result ) m_signal_default_interface_changed.emit( old_default, m_default_interface );
 
@@ -340,7 +351,7 @@ namespace DBus
     }
 
     // ========== READ LOCK ==========
-    pthread_rwlock_rdlock( &m_interfaces_rwlock );
+    DBUS_CXX_LOCK_SHARED( m_priv->m_interfaces_rwlock );
 
     current = m_interfaces.lower_bound( callmessage->interface_name() );
 
@@ -358,8 +369,8 @@ namespace DBus
       upper = m_interfaces.upper_bound( callmessage->interface_name() );
 
 
-    SIMPLELOGGER_DEBUG("dbus.Object","Object::handle_message: before handling lower bound interface is " << current->second->name() );
-    SIMPLELOGGER_DEBUG("dbus.Object","Object::handle_message: before handling upper bound interface is " << (upper->second ? upper->second->name() : ""));
+      SIMPLELOGGER_DEBUG("dbus.Object","Object::handle_message: before handling lower bound interface is " << current->second->name() );
+      SIMPLELOGGER_DEBUG("dbus.Object","Object::handle_message: before handling upper bound interface is " << (upper == m_interfaces.end() ? "" : upper->second->name()));
 
       // Iterate through each interface with a matching name
       for ( ; current != upper; current++ )
@@ -378,7 +389,7 @@ namespace DBus
       result = m_default_interface->handle_call_message(connection, callmessage);
 
     // ========== UNLOCK ==========
-    pthread_rwlock_unlock( &m_interfaces_rwlock );
+    DBUS_CXX_UNLOCK_SHARED( m_priv->m_interfaces_rwlock );
 
     SIMPLELOGGER_DEBUG("dbus.Object","Object::handle_message: message was " << ((result==HANDLED)?"handled":"not handled"));
 
@@ -387,9 +398,9 @@ namespace DBus
 
   void Object::on_interface_name_changed(const std::string & oldname, const std::string & newname, Interface::pointer iface)
   {
-  
+
     // ========== WRITE LOCK ==========
-    pthread_rwlock_wrlock( &m_interfaces_rwlock );
+    DBUS_CXX_LOCK_EXCLUSIVE( m_priv->m_interfaces_rwlock );
 
     Interfaces::iterator current, upper;
     current = m_interfaces.lower_bound(oldname);
@@ -419,7 +430,7 @@ namespace DBus
     }
     
     // ========== UNLOCK ==========
-    pthread_rwlock_unlock( &m_interfaces_rwlock );
+    DBUS_CXX_UNLOCK_EXCLUSIVE( m_priv->m_interfaces_rwlock );
   }
 
 

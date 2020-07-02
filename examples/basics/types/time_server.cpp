@@ -32,7 +32,6 @@
 #include <dbus-cxx.h>
 #include <iostream>
 #include <sys/time.h>
-#include <unistd.h>
 
 
 struct timeval now() {
@@ -68,7 +67,7 @@ int main()
   for (int i=0; i < 20; i++)
   {
     std::cout << "." << std::flush;
-    sleep(1);
+    std::this_thread::sleep_for(std::chrono::seconds(1));
   }
   
   std::cout << std::endl;

@@ -299,7 +299,11 @@ FOR(0, eval(CALL_SIZE),[[DECLARE_CREATE_SIGNAL(%1)
     private:
 
       Object* m_object;
-      
+
+      class priv_data;
+
+      std::unique_ptr<priv_data> m_priv;
+
     protected:
 
       friend class Object;
@@ -311,13 +315,6 @@ FOR(0, eval(CALL_SIZE),[[DECLARE_CREATE_SIGNAL(%1)
       Methods m_methods;
 
       Signals m_signals;
-
-      mutable pthread_rwlock_t m_methods_rwlock;
-
-      mutable pthread_rwlock_t m_signals_rwlock;
-
-      /** Ensures that the name doesn't change while the name changed signal is emitting */
-      pthread_mutex_t m_name_mutex;
 
       sigc::signal<void,const std::string&,const std::string&> m_signal_name_changed;
       

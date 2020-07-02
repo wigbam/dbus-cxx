@@ -17,13 +17,17 @@
  *   along with this software. If not see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 #include "dispatcher.h"
-#include <iostream>
+
+#include "signalmessage.h"
 #include <dbus/dbus.h>
 
-#include <dbus-cxx/signalmessage.h>
-
-#include <sys/select.h>
+#include <iostream>
 #include <errno.h>
+#include <poll.h>
+
+#if defined( _WIN32 ) && defined( connect )
+#undef connect
+#endif
 
 namespace DBus
 {

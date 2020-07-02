@@ -19,7 +19,6 @@
 #include <dbus-cxx.h>
 #include <iostream>
 #include <cmath>
-#include <unistd.h>
 
 /**
  * This example uses the low-level dbus-cxx methods(but not the low-level
@@ -49,7 +48,7 @@ int main()
   for (int i=0; i < 10; i++)
   {
     std::cout << "." << std::flush;
-    sleep(1);
+    std::this_thread::sleep_for(std::chrono::seconds(1));
   }
   
   std::cout << std::endl;

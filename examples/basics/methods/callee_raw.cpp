@@ -19,7 +19,6 @@
 #include <dbus-cxx.h>
 #include <iostream>
 #include <cmath>
-#include <unistd.h>
 
 void reply_to_method_call( DBus::CallMessage::pointer msg, DBus::Connection::pointer conn );
 
@@ -43,7 +42,7 @@ int main()
 
     // loop again if we haven't got a message
     if ( !msg ) {
-      sleep( 1 );
+      std::this_thread::sleep_for( std::chrono::seconds( 1 ) );
       continue;
     }
 

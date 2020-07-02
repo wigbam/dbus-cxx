@@ -19,6 +19,7 @@
 #ifndef TIMEVAL_DBUS_H
 #define TIMEVAL_DBUS_H
 
+#include <sys/time.h>
 #include <string>
 /* VERY IMPORTANT: Because of how dbus-cxx finds signatures, the definition
  * of the signature needs to be before the general dbus-cxx includes 

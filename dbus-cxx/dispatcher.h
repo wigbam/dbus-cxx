@@ -16,13 +16,7 @@
  *   You should have received a copy of the GNU General Public License     *
  *   along with this software. If not see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
-#include <map>
-#include <list>
-#include <set>
 #include <thread>
-#include <mutex>
-
-#include <poll.h>
 
 #include <dbus/dbus.h>
 #include <dbus-cxx/connection.h>
@@ -85,14 +79,13 @@ namespace DBus
       
       bool is_running();
 
+    private:
+
+      class priv_data;
+
+      std::unique_ptr<priv_data> m_priv;
+
     protected:
-      
-      typedef std::list<Connection::pointer> Connections;
-      Connections m_connections;
-      
-      volatile bool m_running;
-      
-      std::thread* m_dispatch_thread;
 
       class WatchPair {
       public:
@@ -104,12 +97,9 @@ namespace DBus
           Watch::pointer read_watch;
           Watch::pointer write_watch;
       };
-      std::mutex m_mutex_watches;
-      std::map<int,WatchPair> m_watches_map;
-      
-      std::mutex m_mutex_exception_fd_set;
-      std::vector<int> m_exception_fd_set;
-      
+
+      volatile bool m_running;
+
       /* socketpair for telling the thread to process data */
       int process_fd[ 2 ];
 
@@ -141,16 +131,6 @@ namespace DBus
       void on_dispatch_status_changed(DispatchStatus, Connection::pointer);
 
       void wakeup_thread();
-
-      /**
-       * Add all read and write watch FDs to the given vector to watch.
-       */
-      void add_read_and_write_watches( std::vector<struct pollfd>* fds );
-
-      /**
-       * Handle all of the read and write watches if the given FD needs to be serviced.
-       */
-      void handle_read_and_write_watches( std::vector<struct pollfd>* fds );
 
       /**
        * Dispatch all of our connections

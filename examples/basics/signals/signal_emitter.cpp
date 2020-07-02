@@ -18,7 +18,6 @@
  ***************************************************************************/
 #include <dbus-cxx.h>
 #include <stdio.h>
-#include <unistd.h>
 
 /**
  * This example demonstrates a signal emitter using a dbus-cxx signal
@@ -48,5 +47,5 @@ int main()
   signal->emit( sigvalue2 );
   connection->flush();
 
-  usleep(250000);
+  std::this_thread::sleep_for(std::chrono::milliseconds(250));
 }

@@ -18,7 +18,6 @@
  ***************************************************************************/
 #include <dbus-cxx.h>
 #include <iostream>
-#include <unistd.h>
 
 double add( double first, double second );
 double subtract( double first, double second );
@@ -58,7 +57,7 @@ int main()
   for (int i=0; i < 10; i++)
   {
     std::cout << "." << std::flush;
-    sleep(1);
+    std::this_thread::sleep_for(std::chrono::seconds(1));
   }
   
   std::cout << std::endl;

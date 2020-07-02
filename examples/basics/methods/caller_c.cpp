@@ -18,7 +18,6 @@
  ***************************************************************************/
 #include <dbus/dbus.h>
 #include <stdio.h>
-#include <unistd.h>
 
 #include <string.h>
 #include <cmath>

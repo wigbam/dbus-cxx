@@ -21,6 +21,7 @@
 #include <expat.h>
 
 #include <cstring>
+#include "string.h"
 
 // TODO fix parser bug when node is part of an interface
 

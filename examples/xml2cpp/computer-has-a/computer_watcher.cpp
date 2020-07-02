@@ -16,10 +16,7 @@
  *   You should have received a copy of the GNU General Public License     *
  *   along with this software. If not see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
-
 #include "computer_proxy.h"
-
-#include <unistd.h>
 
 void print_calculation(std::string op, std::string opsym, double result, double param1, double param2);
 
@@ -43,7 +40,7 @@ int main()
   for (int i=0; i < 30; i++)
   {
     std::cout << "." << std::flush;
-    sleep(1);
+    std::this_thread::sleep_for(std::chrono::seconds(1));
   }
   
   std::cout << std::endl;

@@ -18,7 +18,6 @@
  ***************************************************************************/
 #include <dbus-cxx.h>
 #include <iostream>
-#include <unistd.h>
 
 double add( double param1, double param2 )      { return param1 + param2; }
 double subtract( double param1, double param2 ) { return param1 - param2; }
@@ -51,7 +50,7 @@ int main()
   for (int i=0; i < 10; i++)
   {
     std::cout << "." << std::flush;
-    sleep(1);
+    std::this_thread::sleep_for(std::chrono::seconds(1));
   }
   
   std::cout << std::endl;

@@ -70,6 +70,7 @@ dnl
  *   You should have received a copy of the GNU General Public License     *
  *   along with this software. If not see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/]
+#include <mutex>
 #include <string>
 
 #include <sigc++/sigc++.h>
@@ -141,7 +142,7 @@ dnl           ]])
       std::string m_name;
 
       /** Ensures that the name doesn't change while the name changed signal is emitting */
-      pthread_mutex_t m_name_mutex;
+      std::mutex m_name_mutex;
 
       sigc::signal<void,const std::string&, const std::string&> m_signal_name_changed;
 

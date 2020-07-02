@@ -18,7 +18,6 @@
  ***************************************************************************/
 #include <dbus-cxx.h>
 #include <stdio.h>
-#include <unistd.h>
 
 /**
  * This example extends the signal-emitter example and demonstrates
@@ -50,7 +49,7 @@ int main()
   signal->emit( sigvalue2 );
   connection->flush();
 
-  usleep(250000);
+  std::this_thread::sleep_for(std::chrono::milliseconds(250));
 }
 
 void callback(std::string s)

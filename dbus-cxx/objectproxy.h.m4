@@ -341,6 +341,12 @@ FOR(0, eval(CALL_SIZE),[[CREATE_SIGNAL(%1)]])
 
       sigc::signal<void,InterfaceProxy::pointer/*old default*/,InterfaceProxy::pointer/*new default*/> signal_default_interface_changed();
 
+    private:
+
+      class priv_data;
+
+      std::unique_ptr<priv_data> m_priv;
+
     protected:
 
       DBusCxxPointer<Connection> m_connection;
@@ -348,10 +354,6 @@ FOR(0, eval(CALL_SIZE),[[CREATE_SIGNAL(%1)]])
       std::string m_destination;
 
       Path m_path;
-      
-      mutable pthread_rwlock_t m_interfaces_rwlock;
-
-      pthread_mutex_t m_name_mutex;
 
       Interfaces m_interfaces;
 

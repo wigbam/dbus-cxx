@@ -23,8 +23,9 @@
 
 #include <sstream>
 #include <dbus-cxx/simplelogger_defs.h>
+#include <dbus-cxx/dbus_cxx_macros.h>
 
-extern simplelogger_log_function dbuscxx_log_function;
+extern DBUS_CXX_EXPORT simplelogger_log_function dbuscxx_log_function;
 
 #define DBUSCXX_LOG_CSTR_HEADER( logger, message, level ) do{\
     if( !dbuscxx_log_function ) break;\

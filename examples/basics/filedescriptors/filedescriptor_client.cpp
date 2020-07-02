@@ -17,8 +17,8 @@
  *   You should have received a copy of the GNU General Public License     *
  *   along with this software. If not see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
-
 #include <dbus-cxx.h>
+
 #include <iostream>
 #include <unistd.h>
 #include <errno.h>

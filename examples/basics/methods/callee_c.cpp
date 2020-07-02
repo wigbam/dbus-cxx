@@ -21,6 +21,11 @@
 #include <unistd.h>
 #include <cmath>
 
+#if defined( _WIN32 ) && !defined( HAVE_SLEEP )
+#include <Windows.h>
+#define sleep( x ) Sleep( ( x * 1000 ) )
+#endif
+
 void reply_to_method_call( DBusMessage* msg, DBusConnection* conn );
 
 int main()

@@ -20,6 +20,11 @@
 #include <stdio.h>
 #include <unistd.h>
 
+#if defined( _WIN32 ) && !defined( HAVE_SLEEP )
+#include <Windows.h>
+#define sleep( x ) Sleep( ( x * 1000 ) )
+#endif
+
 /**
  * This is an example from the dbus library and demonstrates a C
  * based signal receiver.

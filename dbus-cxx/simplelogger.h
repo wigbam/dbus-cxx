@@ -14,6 +14,7 @@
 #define SIMPLELOGGER_H
 
 #include "simplelogger_defs.h"
+#include "dbus_cxx_macros.h"
 
 #ifndef SIMPLELOGGER_FUNCTION
   #ifdef _MSC_VER
@@ -29,7 +30,7 @@
 #ifndef SIMPLELOGGER_LOG_FUNCTION_NAME
 #define SIMPLELOGGER_LOG_FUNCTION_NAME simplelogger_global_log_function
 #endif
-extern simplelogger_log_function SIMPLELOGGER_LOG_FUNCTION_NAME;
+extern DBUS_CXX_EXPORT simplelogger_log_function SIMPLELOGGER_LOG_FUNCTION_NAME;
 
 #define SIMPLELOGGER_LOG_CSTR( logger, message, level ) do{\
     if( !SIMPLELOGGER_LOG_FUNCTION_NAME ) break;\

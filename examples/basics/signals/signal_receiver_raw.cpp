@@ -18,7 +18,6 @@
  ***************************************************************************/
 #include <dbus-cxx.h>
 #include <iostream>
-#include <unistd.h>
 
 /**
  * This example demonstrates a signal receiver that uses raw dbus-cxx bus
@@ -47,7 +46,7 @@ int main()
 
     // loop again if we haven't read a message
     if ( !msg || !msg->is_valid() ) {
-      sleep( 1 );
+      std::this_thread::sleep_for( std::chrono::seconds( 1 ) );
       continue;
     }
 

@@ -24,8 +24,9 @@
 #include "error.h"
 #include "connection.h"
 #include "dbus-cxx-private.h"
+#include "dbus_cxx_macros.h"
 
-simplelogger_log_function dbuscxx_log_function = nullptr;
+DBUS_CXX_EXPORT simplelogger_log_function dbuscxx_log_function = nullptr;
 
 namespace DBus
 {
@@ -50,7 +51,7 @@ namespace DBus
     if ( threadsafe ){
         std::unique_lock<std::mutex> lock( init_mutex );
         result = dbus_threads_init_default();
-	if (!result) throw std::bad_alloc();
+	    if ( !result ) throw std::bad_alloc();
 
         result = dbus_connection_allocate_data_slot( & Connection::m_weak_pointer_slot );
         if ( !result ) throw ErrorFailed::create();
@@ -74,7 +75,7 @@ namespace DBus
   void logStdErr( const char* logger_name, const struct SL_LogLocation* location,
       const enum SL_LogLevel level,
       const char* log_string ){
-    if( level <= log_level ) return;
+    if ( level < log_level ) return;
 
     char buffer[ 4096 ];
     const char* stringLevel;

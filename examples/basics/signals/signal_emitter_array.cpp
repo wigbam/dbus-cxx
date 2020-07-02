@@ -16,8 +16,9 @@
  *   You should have received a copy of the GNU General Public License     *
  *   along with this software. If not see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
+#define _USE_MATH_DEFINES
+
 #include <dbus-cxx.h>
-#include <unistd.h>
 #include <cmath>
 
 /**
@@ -46,7 +47,7 @@ int main()
 
   signal->emit( array );
 
-  usleep(250000);
+  std::this_thread::sleep_for(std::chrono::milliseconds(250));
 
   return 0;
 }

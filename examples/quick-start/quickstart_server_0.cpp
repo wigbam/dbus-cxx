@@ -17,7 +17,6 @@
  *   along with this software. If not see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 #include <dbus-cxx.h>
-#include <unistd.h>
 
 double add( double param1, double param2 )      { return param1 + param2; }
 
@@ -40,7 +39,7 @@ int main()
   //add a method that can be called over the dbus
   object->create_method<double,double,double>("dbuscxx.Quickstart", "add", sigc::ptr_fun(add) );
 
-  sleep(10);
-  
+  std::this_thread::sleep_for(std::chrono::seconds(10));
+
   return 0;
 }

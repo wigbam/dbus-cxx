@@ -17,7 +17,6 @@
  *   along with this software. If not see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 #include <dbus-cxx.h>
-#include <unistd.h>
 
 #include "test_macros.h"
 
@@ -46,7 +45,7 @@ bool signal_tx_rx(){
     proxy->connect( sigc::ptr_fun( sigHandle ) );
 
     signal->emit( "TestSignal" );
-    sleep( 1 );
+    std::this_thread::sleep_for( std::chrono::milliseconds( 100 ) );
 
     TEST_ASSERT_RET_FAIL( signal_value.compare( "TestSignal" ) == 0 );
     return true;
@@ -58,8 +57,10 @@ bool signal_tx_rx(){
 } while( 0 )
 
 int main(int argc, char** argv){
-  if(argc < 1)
+  if( argc < 2 ) {
+    std::cerr << "USAGE: <test_name>" << std::endl;
     return 1;
+  }
 
   std::string test_name = argv[1];
   bool ret = false;

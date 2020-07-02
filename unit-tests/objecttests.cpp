@@ -59,8 +59,10 @@ bool object_export_method(){
 } while( 0 )
 
 int main(int argc, char** argv){
-  if(argc < 1)
+  if( argc < 2 ) {
+    std::cerr << "USAGE: <test_name>" << std::endl;
     return 1;
+  }
 
   std::string test_name = argv[1];
   bool ret = false;

@@ -429,13 +429,15 @@ FOR(0, eval(CALL_SIZE),[[DECLARE_CREATE_SIGNAL_IN(%1)
        */
       virtual HandlerResult handle_message( DBusCxxPointer<Connection> conn, Message::const_pointer msg);
 
+    private:
+
+      class priv_data;
+
+      std::unique_ptr<priv_data> m_priv;
+
     protected:
 
       Children m_children;
-      
-      mutable pthread_rwlock_t m_interfaces_rwlock;
-
-      pthread_mutex_t m_name_mutex;
 
       Interfaces m_interfaces;
 

@@ -26,19 +26,16 @@ namespace DBus
   MethodBase::MethodBase(const std::string& name):
       m_name(name)
   {
-    pthread_mutex_init( &m_name_mutex, NULL );
     SIMPLELOGGER_DEBUG( "dbus.MethodBase", "Creating new method with name " << name );
   }
 
   MethodBase::MethodBase(const MethodBase& other):
       m_name(other.m_name)
   {
-    pthread_mutex_init( &m_name_mutex, NULL );
   }
 
   MethodBase::~MethodBase()
   {
-    pthread_mutex_destroy( &m_name_mutex );
   }
 
   const std::string & MethodBase::name() const
@@ -48,10 +45,10 @@ namespace DBus
 
   void MethodBase::set_name(const std::string & name)
   {
-    pthread_mutex_lock( &m_name_mutex );
+    m_name_mutex.lock();
     std::string old_name = m_name;
     m_name = name;
-    pthread_mutex_unlock( &m_name_mutex );
+    m_name_mutex.unlock();
     m_signal_name_changed.emit(old_name, m_name);
   }
 

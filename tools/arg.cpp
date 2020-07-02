@@ -1,7 +1,7 @@
 #include "arg.h"
 #include "parsed_object.h"
 
-#include <string.h>
+#include "string.h"
 
 Direction Arg::direction()
 {

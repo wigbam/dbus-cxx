@@ -17,21 +17,36 @@
  *   along with this software. If not see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 #include "objectproxy.h"
+
 #include "connection.h"
+#include "dbus-cxx-private.h"
 #include "interface.h"
+#include "locks.h"
 
 #include <map>
 #include <dbus/dbus.h>
 
 namespace DBus
 {
+  class ObjectProxy::priv_data {
+  public:
+      priv_data() {
+          DBUS_CXX_SHARED_LOCK_INIT( m_interfaces_rwlock );
+      }
+
+      ~priv_data() {
+          DBUS_CXX_SHARED_LOCK_DESTROY( m_interfaces_rwlock );
+      }
+
+      mutable DBUS_CXX_SHARED_LOCK_TYPE m_interfaces_rwlock;
+  };
+
   ObjectProxy::ObjectProxy( Connection::pointer conn, const std::string& destination, const std::string& path ):
       m_connection(conn),
       m_destination(destination),
       m_path(path)
   {
-    pthread_mutex_init( &m_name_mutex, NULL );
-    pthread_rwlock_init( &m_interfaces_rwlock, NULL );
+    m_priv = std::make_unique<priv_data>();
   }
 
   ObjectProxy::pointer ObjectProxy::create( const std::string& path )
@@ -56,8 +71,6 @@ namespace DBus
 
   ObjectProxy::~ ObjectProxy( )
   {
-    pthread_mutex_destroy( &m_name_mutex );
-    pthread_rwlock_destroy( &m_interfaces_rwlock );
   }
 
   Connection::pointer ObjectProxy::connection() const
@@ -108,12 +121,12 @@ namespace DBus
     Interfaces::const_iterator iter;
 
     // ========== READ LOCK ==========
-    pthread_rwlock_rdlock( &m_interfaces_rwlock );
+    DBUS_CXX_LOCK_SHARED( m_priv->m_interfaces_rwlock );
 
     iter = m_interfaces.find( name );
 
     // ========== UNLOCK ==========
-    pthread_rwlock_unlock( &m_interfaces_rwlock );
+    DBUS_CXX_UNLOCK_SHARED( m_priv->m_interfaces_rwlock );
 
     if ( iter == m_interfaces.end() ) return InterfaceProxy::pointer();
 
@@ -134,7 +147,7 @@ namespace DBus
     if ( iface->m_object ) iface->m_object->remove_interface( iface );
     
     // ========== WRITE LOCK ==========
-    pthread_rwlock_wrlock( &m_interfaces_rwlock );
+    DBUS_CXX_LOCK_EXCLUSIVE( m_priv->m_interfaces_rwlock );
 
     InterfaceSignalNameConnections::iterator i;
 
@@ -154,7 +167,7 @@ namespace DBus
     }
 
     // ========== UNLOCK ==========
-    pthread_rwlock_unlock( &m_interfaces_rwlock );
+    DBUS_CXX_UNLOCK_EXCLUSIVE( m_priv->m_interfaces_rwlock );
 
     m_signal_interface_added.emit( iface );
 
@@ -184,7 +197,7 @@ namespace DBus
     bool need_emit_default_changed = false;
 
     // ========== WRITE LOCK ==========
-    pthread_rwlock_wrlock( &m_interfaces_rwlock );
+    DBUS_CXX_LOCK_EXCLUSIVE( m_priv->m_interfaces_rwlock );
     
     iter = m_interfaces.find( name );
     if ( iter != m_interfaces.end() )
@@ -211,7 +224,7 @@ namespace DBus
     }
 
     // ========== UNLOCK ==========
-    pthread_rwlock_unlock( &m_interfaces_rwlock );
+    DBUS_CXX_UNLOCK_EXCLUSIVE( m_priv->m_interfaces_rwlock );
 
     if ( iface ) m_signal_interface_removed.emit( iface );
 
@@ -230,7 +243,7 @@ namespace DBus
     if ( !iface ) return;
 
     // ========== WRITE LOCK ==========
-    pthread_rwlock_wrlock( &m_interfaces_rwlock );
+    DBUS_CXX_LOCK_EXCLUSIVE( m_priv->m_interfaces_rwlock );
 
     current = m_interfaces.lower_bound( iface->name() );
     upper = m_interfaces.upper_bound( iface->name() );
@@ -263,7 +276,7 @@ namespace DBus
     }
 
     // ========== UNLOCK ==========
-    pthread_rwlock_unlock( &m_interfaces_rwlock );
+    DBUS_CXX_UNLOCK_EXCLUSIVE( m_priv->m_interfaces_rwlock );
 
     if ( interface_removed ) m_signal_interface_removed.emit( iface );
 
@@ -275,12 +288,12 @@ namespace DBus
     Interfaces::const_iterator i;
     
     // ========== READ LOCK ==========
-    pthread_rwlock_rdlock( &m_interfaces_rwlock );
+    DBUS_CXX_LOCK_SHARED( m_priv->m_interfaces_rwlock );
 
     i = m_interfaces.find( name );
 
     // ========== UNLOCK ==========
-    pthread_rwlock_unlock( &m_interfaces_rwlock );
+    DBUS_CXX_UNLOCK_SHARED( m_priv->m_interfaces_rwlock );
 
     return ( i != m_interfaces.end() );
   }
@@ -293,7 +306,7 @@ namespace DBus
     bool result = false;
 
     // ========== READ LOCK ==========
-    pthread_rwlock_rdlock( &m_interfaces_rwlock );
+    DBUS_CXX_LOCK_SHARED( m_priv->m_interfaces_rwlock );
 
     current = m_interfaces.lower_bound(iface->name());
 
@@ -311,7 +324,7 @@ namespace DBus
     }
 
     // ========== UNLOCK ==========
-    pthread_rwlock_unlock( &m_interfaces_rwlock );
+    DBUS_CXX_UNLOCK_SHARED( m_priv->m_interfaces_rwlock );
 
     return result;
   }
@@ -328,7 +341,7 @@ namespace DBus
     bool result = false;
 
     // ========== READ LOCK ==========
-    pthread_rwlock_rdlock( &m_interfaces_rwlock );
+    DBUS_CXX_LOCK_SHARED( m_priv->m_interfaces_rwlock );
 
     iter = m_interfaces.find( new_default_name );
 
@@ -340,7 +353,7 @@ namespace DBus
     }
     
     // ========== UNLOCK ==========
-    pthread_rwlock_unlock( &m_interfaces_rwlock );
+    DBUS_CXX_UNLOCK_SHARED( m_priv->m_interfaces_rwlock );
 
     if ( result ) m_signal_default_interface_changed.emit( old_default, m_default_interface );
 
@@ -471,7 +484,7 @@ namespace DBus
   {
   
     // ========== WRITE LOCK ==========
-    pthread_rwlock_wrlock( &m_interfaces_rwlock );
+      DBUS_CXX_LOCK_EXCLUSIVE( m_priv->m_interfaces_rwlock );
 
     Interfaces::iterator current, upper;
     current = m_interfaces.lower_bound(oldname);
@@ -501,7 +514,7 @@ namespace DBus
     }
     
     // ========== UNLOCK ==========
-    pthread_rwlock_unlock( &m_interfaces_rwlock );
+    DBUS_CXX_UNLOCK_EXCLUSIVE( m_priv->m_interfaces_rwlock );
   }
 
 }

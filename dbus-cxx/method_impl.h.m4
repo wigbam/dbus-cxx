@@ -52,6 +52,7 @@ define([METHOD_VOID],[dnl
         i FOR(1, $1,[ >> _val_%1]);
       }
       catch ( ErrorInvalidTypecast& e ) {
+          (void)e; // prevent compiler warnings
           return NOT_HANDLED;
       }
       ],[])

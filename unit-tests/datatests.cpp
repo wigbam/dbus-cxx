@@ -17,7 +17,6 @@
  *   along with this software. If not see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 #include <dbus-cxx.h>
-#include <unistd.h>
 
 #include "test_macros.h"
 
@@ -72,8 +71,10 @@ bool data_void_method(){
 } while( 0 )
 
 int main(int argc, char** argv){
-  if(argc < 1)
+  if( argc < 3 ) {
+    std::cerr << "USAGE: <server|client> <test_name>" << std::endl;
     return 1;
+  }
 
   std::string test_name = argv[2];
   bool ret = false;
@@ -90,7 +91,7 @@ int main(int argc, char** argv){
   }else{
     server_setup();
     ret = true;
-    sleep( 1 );
+    std::this_thread::sleep_for( std::chrono::seconds( 1 ) );
   }
 
 

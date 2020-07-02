@@ -22,7 +22,6 @@
 #include "dbus-cxx-private.h"
 
 #include <iostream>
-#include <sys/time.h>
 #include <cassert>
 
 #include <dbus-cxx/signalmessage.h>

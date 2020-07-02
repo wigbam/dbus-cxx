@@ -28,12 +28,14 @@ option( TOOLS_BUNDLED_CPPGENERATE "Use bundled libcppgenerate" ON )
 option( BUILD_STATIC_LIBRARIES "Build static library" OFF )
 option( ENABLE_CODE_COVERAGE_REPORT "Enable code coverage report" OFF )
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake-modules")
+list( APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake-modules" )
 
 include( CheckIncludeFiles )
 include( GNUInstallDirs )
 include( FindPkgConfig )
 include( CheckTypeSize )
+include( CheckSymbolExists )
+include( CheckCXXSymbolExists )
 
 if( ENABLE_CODE_COVERAGE_REPORT )
     include( CodeCoverage )
@@ -50,9 +52,73 @@ set( DBUS_CXX_MAJMIN_VERSION ${DBUS_CXX_PACKAGE_MAJOR_VERSION}.${DBUS_CXX_PACKAG
 pkg_check_modules( dbus REQUIRED dbus-1>=1.3 )
 pkg_check_modules( sigc REQUIRED sigc++-2.0 )
 
+if( WIN32 )
+	pkg_check_modules( Boost boost>=1.70 )
+	if ( Boost_FOUND )
+		include_directories( ${Boost_INCLUDE_DIRS} )
+	else()
+		find_package( Boost 1.70 REQUIRED )
+	endif( Boost_FOUND )
+	add_definitions( -DBOOST_ASIO_STANDALONE )
+endif( WIN32 )
+
+if( BUILD_STATIC_LIBRARIES )
+	link_directories( ${dbus_STATIC_LIBRARY_DIRS} ${sigc_STATIC_LIBRARY_DIRS} )
+else()
+	link_directories( ${dbus_LIBRARY_DIRS} ${sigc_LIBRARY_DIRS} )
+endif( BUILD_STATIC_LIBRARIES )
+
 # Dbus-cxx requires at least C++11
 set( CMAKE_CXX_STANDARD 11 )
 set( CMAKE_CXX_STANDARD_REQUIRED ON )
+
+#
+# Build environment
+#
+function( check_symbol NAME FILE VAR )
+    check_symbol_exists( ${NAME} "${FILE}" ${VAR} )
+    if( ${VAR} )
+        add_definitions( -D${VAR} )
+    endif( ${VAR} )
+endfunction( check_symbol )
+
+function( check_cxx_symbol NAME FILE VAR )
+    check_cxx_symbol_exists( ${NAME} "${FILE}" ${VAR} )
+    if( ${VAR} )
+        add_definitions( -D${VAR} )
+    endif( ${VAR} )
+endfunction( check_cxx_symbol )
+
+if( WIN32 )
+    if( CMAKE_SYSTEM_VERSION )
+        set( ver ${CMAKE_SYSTEM_VERSION} )
+        string( REGEX MATCH "^([0-9]+).([0-9])" ver ${ver} )
+        string( REGEX MATCH "^([0-9]+)" verMajor ${ver} )
+        # Check for Windows 10, b/c we'll need to convert to hex 'A'.
+        if( "${verMajor}" MATCHES "10" )
+            set( verMajor "A" )
+            string( REGEX REPLACE "^([0-9]+)" ${verMajor} ver ${ver} )
+        endif()
+        # Remove all remaining '.' characters.
+        string( REPLACE "." "" ver ${ver} )
+        # Prepend each digit with a zero.
+        string( REGEX REPLACE "([0-9A-Z])" "0\\1" ver ${ver} )
+        set( WIN32_VER "0x${ver}" )
+    endif( CMAKE_SYSTEM_VERSION )
+
+    add_definitions( -D_WIN32_WINNT=${WIN32_VER} )
+    check_cxx_symbol( shared_mutex "shared_mutex" HAVE_SHARED_MUTEX )
+
+    set( CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON )
+	if( MSVC )
+        set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zc:__cplusplus" )
+	endif( MSVC )
+endif( WIN32 )
+
+check_symbol( localtime_r "time.h" HAVE_LOCALTIME_R )
+check_symbol( pipe "unistd.h" HAVE_PIPE )
+check_symbol( pipe2 "unistd.h" HAVE_PIPE2 )
+check_symbol( sleep "unistd.h" HAVE_SLEEP )
 
 #
 # Configure our compile options
@@ -105,6 +171,7 @@ set( DBUS_CXX_HEADERS1
 set( DBUS_CXX_HEADERS
     dbus-cxx/accumulators.h
     dbus-cxx/callmessage.h
+    dbus-cxx/dbus_cxx_macros.h
     dbus-cxx/dispatcher.h
     dbus-cxx/enums.h
     dbus-cxx/error.h
@@ -144,7 +211,17 @@ set( DBUS_CXX_INCLUDE_DIRECTORIES
     ${CMAKE_CURRENT_SOURCE_DIR}/dbus-cxx
     ${CMAKE_CURRENT_BINARY_DIR}
     ${CMAKE_CURRENT_BINARY_DIR}/dbus-cxx )
-include_directories( ${DBUS_CXX_INCLUDE_DIRECTORIES} 
+
+if( WIN32 )
+	set( DBUS_CXX_INCLUDE_DIRECTORIES ${DBUS_CXX_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/compat )
+	set( DBUS_CXX_SOURCES ${DBUS_CXX_SOURCES}
+	    compat/poll.c
+	    compat/pipe2.c
+	    compat/posix_win.c
+	)
+endif( WIN32 )
+
+include_directories( ${DBUS_CXX_INCLUDE_DIRECTORIES}
     ${dbus_INCLUDE_DIRS} 
     ${sigc_INCLUDE_DIRS} )
 
@@ -171,7 +248,10 @@ target_link_libraries( dbus-cxx ${dbus_LIBRARIES} ${sigc_LIBRARIES} ${DBUS_CXX_E
 
 if( BUILD_STATIC_LIBRARIES )
 	add_library( dbus-cxx-static STATIC ${DBUS_CXX_SOURCES} )
-    set_target_properties( dbus-cxx-static PROPERTIES OUTPUT_NAME "dbus-cxx" )
+	target_compile_definitions( dbus-cxx-static PUBLIC DBUS_STATIC_BUILD DBUS_CXX_STATIC_BUILD )
+	if( NOT WIN32 )
+        set_target_properties( dbus-cxx-static PROPERTIES OUTPUT_NAME "dbus-cxx" )
+    endif( NOT WIN32 )
 	target_link_libraries( dbus-cxx-static
 	    ${dbus_STATIC_LIBRARIES}
 	    ${sigc_STATIC_LIBRARIES}
@@ -201,7 +281,9 @@ if( ENABLE_GLIBMM )
     set_target_properties( dubs-cxx-glibmm PROPERTIES VERSION 1.0.0 SOVERSION 1 )
 	if( BUILD_STATIC_LIBRARIES )
         build_glibmm_library( dbus-cxx-glibmm-static STATIC dbus-cxx-static "STATIC_" )
-        set_target_properties( dbus-cxx-glibmm-static PROPERTIES OUTPUT_NAME "dbus-cxx-glibmm" )
+	    if( NOT WIN32 )
+            set_target_properties( dbus-cxx-glibmm-static PROPERTIES OUTPUT_NAME "dbus-cxx-glibmm" )
+        endif( NOT WIN32 )
     endif( BUILD_STATIC_LIBRARIES )
 
     install( FILES dbus-cxx-glibmm.h DESTINATION include/dbus-cxx-${DBUS_CXX_MAJMIN_VERSION} )
@@ -264,13 +346,20 @@ endif( BUILD_STATIC_LIBRARIES )
 
 install( TARGETS ${install_targets}
     LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-    ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}" )
+    ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+    RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}" )
 install( FILES ${DBUS_CXX_HEADERS} DESTINATION include/dbus-cxx-${DBUS_CXX_MAJMIN_VERSION}/dbus-cxx )
 install( FILES ${DBUS_CXX_HEADERS1} DESTINATION include/dbus-cxx-${DBUS_CXX_MAJMIN_VERSION} )
 
 #
 # pkg-config script creation and install
 #
+if( WIN32 )
+    SET( PKG_CONFIG_INSTALL_PREFIX "\${INSTALL_PREFIX}" )
+else()
+    SET( PKG_CONFIG_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}" )
+endif( WIN32 )
+
 SET(PKG_CONFIG_LIBDIR
     "\${prefix}/lib"
 )
@@ -291,8 +380,12 @@ SET(PKG_CONFIG_REQUIRES
 )
 if ( BUILD_STATIC_LIBRARIES )
     if( CMAKE_THREAD_LIBS_INIT )
-        SET( PKG_CONFIG_LIBS_PRIVATE ${CMAKE_THREAD_LIBS_INIT} )
+        set( PKG_CONFIG_LIBS_PRIVATE ${CMAKE_THREAD_LIBS_INIT} )
     endif( CMAKE_THREAD_LIBS_INIT )
+    if( WIN32 )
+        set( PKG_CONFIG_LIBS_PRIVATE ${PKG_CONFIG_LIBS_PRIVATE} "-ldbus-cxx-static" )
+        set( PKG_CONFIG_LIBS_MM_PRIVATE "-ldbus-cxx-glibmm-static" )
+    endif( WIN32 )
 endif( BUILD_STATIC_LIBRARIES )
 
 CONFIGURE_FILE(
@@ -371,12 +464,47 @@ endif( ENABLE_CODE_COVERAGE_REPORT )
 #
 # Cpack for creating the dist files
 #
-set(CPACK_SOURCE_PACKAGE_FILE_NAME "dbus-cxx-${PKG_VERSION}")
-set(CPACK_PACKAGE_VERSION_MAJOR ${DBUS_CXX_PACKAGE_MAJOR_VERSION})
-set(CPACK_PACKAGE_VERSION_MINOR ${DBUS_CXX_PACKAGE_MINOR_VERSION})
-set(CPACK_PACKAGE_VERSION_PATCH ${DBUS_CXX_PACKAGE_MICRO_VERSION})
-set(CPACK_SOURCE_GENERATOR "TGZ")
-set(CPACK_SOURCE_IGNORE_FILES ".git/;build/")
+set( CPACK_SOURCE_PACKAGE_FILE_NAME "dbus-cxx-${PKG_VERSION}" )
+set( CPACK_PACKAGE_VENDOR dbus-cxx )
+set( CPACK_PACKAGE_VERSION_MAJOR ${DBUS_CXX_PACKAGE_MAJOR_VERSION} )
+set( CPACK_PACKAGE_VERSION_MINOR ${DBUS_CXX_PACKAGE_MINOR_VERSION} )
+set( CPACK_PACKAGE_VERSION_PATCH ${DBUS_CXX_PACKAGE_MICRO_VERSION} )
+set( CPACK_SOURCE_GENERATOR "TGZ" )
+set( CPACK_SOURCE_IGNORE_FILES ".git/;build/" )
+set( CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/COPYING" )
+
+if( ${CPACK_BINARY_NSIS} )
+    string( TOLOWER ${CMAKE_GENERATOR_PLATFORM} CMAKE_GENERATOR_PLATFORM_LOWER )
+    set( CPACK_NSIS_PACKAGE_NAME "dbus-cxx-${CMAKE_GENERATOR_PLATFORM_LOWER}-${PKG_VERSION}" )
+    set( CPACK_NSIS_DISPLAY_NAME "${CPACK_NSIS_PACKAGE_NAME}" )
+    set( CPACK_PACKAGE_INSTALL_DIRECTORY "${CPACK_NSIS_PACKAGE_NAME}" )
+    set( CPACK_PACKAGE_INSTALL_REGISTRY_KEY "${CPACK_NSIS_PACKAGE_NAME}" )
+    set( CPACK_NSIS_MUI_ICON "${CMAKE_CURRENT_SOURCE_DIR}/.folder.ico" )
+    set( CPACK_NSIS_MUI_UNIICON "${CPACK_NSIS_MUI_ICON}" )
+    set( CPACK_NSIS_HELP_LINK "https://dbus-cxx.github.io/" )
+    set( CPACK_NSIS_URL_INFO_ABOUT "https://dbus-cxx.github.io/" )
+    set( CPACK_NSIS_MODIFY_PATH ON )
+
+    # Patch NSIS.template.in to include helper functions
+    set( DBUS_CXX_NSIS_TEMPLATE_FILE "${CMAKE_CURRENT_BINARY_DIR}/NSIS.template.in" )
+    configure_file( "${CMAKE_SOURCE_DIR}/cmake-modules/NSISExtra.nsh" "${DBUS_CXX_NSIS_TEMPLATE_FILE}" COPYONLY )
+    file( GLOB_RECURSE DBUS_CXX_NSIS_TEMPLATE FOLLOW_SYMLINKS "${CMAKE_ROOT}/Modules/*NSIS.template.in" )
+    file( READ ${DBUS_CXX_NSIS_TEMPLATE} NSIS_TEMPLATE_CONTENTS )
+    file( APPEND ${DBUS_CXX_NSIS_TEMPLATE_FILE} "${NSIS_TEMPLATE_CONTENTS}" )
+    list( APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_BINARY_DIR}" )
+
+    # Populate correct pkg-config PREFIX paths after install
+    file( GLOB DBUS_CXX_PKG_CONFIG_FILES "${CMAKE_CURRENT_BINARY_DIR}/*.pc" )
+    foreach( DBUS_CXX_PKG_CONFIG_FILE IN LISTS DBUS_CXX_PKG_CONFIG_FILES )
+        get_filename_component( DBUS_CXX_PKG_CONFIG_FILENAME ${DBUS_CXX_PKG_CONFIG_FILE} NAME )
+        list( APPEND CPACK_NSIS_EXTRA_INSTALL_COMMANDS
+            "\\\${StrRep} \\\$0 \\\"\\\$INSTDIR\\\" \\\"\\\\\\\" \\\"/\\\"" )
+        list( APPEND CPACK_NSIS_EXTRA_INSTALL_COMMANDS
+            "!insertmacro _ReplaceInFile \\\"\\\$INSTDIR\\\\${CMAKE_INSTALL_LIBDIR}\\\\pkgconfig\\\\${DBUS_CXX_PKG_CONFIG_FILENAME}\\\" \\\"\\\$\\\${INSTALL_PREFIX}\\\" \\\"\\\$0\\\"" )
+    endforeach()
+    string( REPLACE ";" "\n" CPACK_NSIS_EXTRA_INSTALL_COMMANDS "${CPACK_NSIS_EXTRA_INSTALL_COMMANDS}" )
+endif( ${CPACK_BINARY_NSIS} )
+
 include(CPack)
 
 #

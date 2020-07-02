@@ -17,8 +17,6 @@
  *   along with this software. If not see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 #include <dbus/dbus.h>
-#include <sys/time.h>
-#include <sys/signal.h>
 #include <dbus-cxx/pointer.h>
 #include <mutex>
 
@@ -77,14 +75,12 @@ namespace DBus
     protected:
       DBusTimeout* m_cobj;
 
-      timer_t m_timer_id;
-
-      bool m_is_armed;
-
       std::mutex m_arming_mutex;
 
-      static void timer_callback_proxy( sigval_t sv );
+    private:
+      class priv_data;
 
+      std::unique_ptr<priv_data> m_priv;
   };
 
 }

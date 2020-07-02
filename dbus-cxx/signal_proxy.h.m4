@@ -79,8 +79,8 @@ class signal_proxy ifelse($1, $2,,[<LIST(T_return, LOOP(T_arg%1,$1), LOOP(nil, C
     static pointer create(const std::string& path, const std::string& interface_name, const std::string& name, const signal_proxy& src)
     { return pointer( new signal_proxy(path, interface_name, name, src) ); }
 
-    virtual signal_base::pointer clone()
-    { return signal_base::pointer( new signal_proxy(*this) ); }
+    virtual DBus::signal_base::pointer clone()
+    { return DBus::signal_base::pointer( new signal_proxy(*this) ); }
 
   protected:
 
@@ -99,6 +99,7 @@ class signal_proxy ifelse($1, $2,,[<LIST(T_return, LOOP(T_arg%1,$1), LOOP(nil, C
         this->emit(LIST(LOOP(_val_%1, $1)));
       }
       catch ( ErrorInvalidTypecast& e ) {
+          (void)e; // prevent compiler warnings
           return NOT_HANDLED;
       }
     

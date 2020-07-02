@@ -2,8 +2,9 @@ Name: dbus-cxx-glibmm
 Description: C++ bindings for dbus(glibmm support)
 Version: ${PKG_VERSION}
 Requires: glibmm-2.4, dbus-cxx-1.0 = ${PKG_VERSION}
-prefix=${CMAKE_INSTALL_PREFIX}
+prefix=${PKG_CONFIG_INSTALL_PREFIX}
 includedir=${PKG_CONFIG_INCLUDEDIR}
 libdir=${PKG_CONFIG_LIBDIR}
 Libs: ${PKG_CONFIG_LIBS_MM}
+Libs.private: ${PKG_CONFIG_LIBS_MM_PRIVATE}
 Cflags: ${PKG_CONFIG_CFLAGS}
